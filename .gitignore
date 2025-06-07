@@ -1,0 +1,52 @@
+node_modules
+
+package-lock.json 
+.vercel
+
+reddit_post.md
+reddit_post_title.md
+.env
+.cache
+misscalleneous/reddit_post_title.md
+misscalleneous/logs.txt
+misscalleneous/reddit_post.md
+misscalleneous
+
+# Environment variables
+.env
+
+# Cookies
+cookies.txt
+
+# IDE / OS specific
+.vscode/
+.idea/
+*.DS_Store
+*.project
+*.classpath
+*.cproject
+*.buildpath
+*.settings/
+*.suo
+*.user
+*.sln.docstates
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+env/
+pip-wheel-metadata/
+.Python
+*.tar.gz
+collaboration_message.md
+.streams_cache
+important_announcement.md
+envs.zip
+qa.md

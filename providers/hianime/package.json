@@ -1,0 +1,15 @@
+{
+  "name": "hianime-scraper-service",
+  "version": "1.0.0",
+  "description": "Self-hosted scraper service for Hianime integration with Nuvio Streams Addon",
+  "main": "hianime-server.js",
+  "scripts": {
+    "start": "node hianime-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1" 
+  }
+} 

@@ -1,0 +1,27 @@
+{
+  "name": "stremio-showbox-scraper",
+  "version": "0.1.0",
+  "description": "Stremio addon for ShowBox streaming links",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "aromanize": "^0.1.5",
+    "axios": "^1.9.0",
+    "body-parser": "^2.2.0",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "hls-parser": "^0.13.5",
+    "ioredis": "^5.6.1",
+    "node-fetch": "^2.7.0",
+    "redis": "^5.5.5",
+    "stremio-addon-sdk": "^1.6.10",
+    "yargs": "^17.7.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

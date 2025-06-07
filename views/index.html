@@ -1,0 +1,3366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuvio Streams Addon</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <style>
+        :root {
+            --primary: #00a3ff;
+            --primary-hover: #0084ff;
+            --secondary: #00c16e;
+            --secondary-hover: #00a65c;
+            --dc-universe: #ff0048;
+            --dc-universe-hover: #c8003a;
+            --star-wars: #ffe81f;
+            --star-wars-hover: #d4bf1a;
+            --background: #000000;
+            --card: #0a0a0a;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --border: #222222;
+            --highlight: #333333;
+            --coming-soon: #6742d9;
+            --nuvio-app: #8c52ff;
+            --nuvio-app-hover: #7038e0;
+            
+            /* ElfHosted Private Instance Theme */
+            --elfhosted-primary: #8c52ff;
+            --elfhosted-primary-light: #a875ff;
+            --elfhosted-secondary: #00c16e;
+            --elfhosted-secondary-light: #00e684;
+            --elfhosted-accent: #ff6432;
+            --elfhosted-bg: #0d1117;
+            --elfhosted-card: #161b22;
+            --elfhosted-border: #30363d;
+            --elfhosted-text: #f0f6fc;
+            --elfhosted-text-light: #8b949e;
+        }
+        
+        /* ElfHosted Theme Override */
+        body.elfhosted-theme {
+            background: linear-gradient(135deg, var(--elfhosted-bg) 0%, #070B10 100%);
+            color: var(--elfhosted-text);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Subtle background pattern */
+        body.elfhosted-theme:before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(140, 82, 255, 0.03) 1%, transparent 5%),
+                radial-gradient(circle at 75% 75%, rgba(0, 193, 110, 0.03) 1%, transparent 5%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        body.elfhosted-theme .card {
+            background-color: var(--elfhosted-card);
+            border: 1px solid var(--elfhosted-border);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+        
+        body.elfhosted-theme .card:before {
+            background: linear-gradient(45deg, var(--elfhosted-primary), transparent, var(--elfhosted-secondary));
+            opacity: 0.5;
+            animation: cardGlow 8s infinite alternate;
+        }
+        
+        @keyframes cardGlow {
+            0% {
+                opacity: 0.3;
+                background-position: 0% 50%;
+            }
+            50% {
+                opacity: 0.6;
+                background-position: 100% 50%;
+            }
+            100% {
+                opacity: 0.3;
+                background-position: 0% 50%;
+            }
+        }
+        
+        body.elfhosted-theme h1, 
+        body.elfhosted-theme h2 {
+            color: var(--elfhosted-text);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.elfhosted-theme .btn-primary {
+            background: linear-gradient(135deg, var(--elfhosted-primary) 0%, #7038e0 100%);
+            box-shadow: 0 6px 15px rgba(140, 82, 255, 0.3);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        
+        body.elfhosted-theme .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(140, 82, 255, 0.4);
+        }
+        
+        body.elfhosted-theme .btn-secondary {
+            background: linear-gradient(135deg, var(--elfhosted-secondary) 0%, #00a65c 100%);
+            box-shadow: 0 6px 15px rgba(0, 193, 110, 0.3);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        
+        body.elfhosted-theme .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 193, 110, 0.4);
+        }
+        
+        body.elfhosted-theme .more-addons-btn {
+            background: linear-gradient(135deg, var(--elfhosted-primary) 0%, #7038e0 100%);
+            box-shadow: 0 6px 15px rgba(140, 82, 255, 0.3);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        body.elfhosted-theme .more-addons-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(140, 82, 255, 0.4);
+        }
+        
+        body.elfhosted-theme .providers,
+        body.elfhosted-theme .disclaimer,
+        body.elfhosted-theme .provider-checkbox-list,
+        body.elfhosted-theme .provider-info-note {
+            background-color: rgba(22, 27, 34, 0.7);
+            border: 1px solid var(--elfhosted-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.elfhosted-theme .elfhosted-credits {
+            background: linear-gradient(135deg, rgba(140, 82, 255, 0.12), rgba(0, 193, 110, 0.12));
+            border: 1px solid rgba(140, 82, 255, 0.25);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* ElfHosted Badge Styles */
+        .elfhosted-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--elfhosted-primary), var(--elfhosted-secondary));
+            background-size: 200% 200%;
+            animation: gradientBadge 3s ease infinite;
+            color: white;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(140, 82, 255, 0.4);
+            z-index: 5;
+            letter-spacing: 0.5px;
+            transform: translateY(0);
+        }
+        
+        @keyframes gradientBadge {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .elfhosted-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+        }
+        
+        .elfhosted-credits {
+            background: linear-gradient(135deg, rgba(140, 82, 255, 0.15), rgba(0, 193, 110, 0.15));
+            border-radius: 0.8rem;
+            padding: 1.25rem;
+            border: 1px solid rgba(140, 82, 255, 0.3);
+            text-align: center;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .elfhosted-provider-note {
+            background-color: rgba(140, 82, 255, 0.08);
+            border: 1px solid rgba(140, 82, 255, 0.2);
+            border-radius: 0.7rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--elfhosted-text-light);
+            margin-top: 1rem;
+            line-height: 1.5;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.elfhosted-theme .provider-item {
+            transition: all 0.3s ease;
+            padding: 0.5rem 0.25rem;
+            border-radius: 0.5rem;
+        }
+        
+        body.elfhosted-theme .provider-item:hover {
+            background-color: rgba(140, 82, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        body.elfhosted-theme .provider-icon {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Add a premium glint effect to the main title */
+        body.elfhosted-theme .premium-title {
+            background: linear-gradient(90deg, #fff 0%, #a875ff 25%, #fff 50%, #00e684 75%, #fff 100%);
+            background-size: 200% auto;
+            color: #000;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #000000 0%, #050505 100%);
+            overflow-x: hidden;
+        }
+        
+        .cards-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            max-width: 1050px;
+            width: 100%;
+            perspective: 1000px;
+            z-index: 1;
+            padding: 0 0.5rem;
+        }
+        
+        .cards-container.expanded {
+            justify-content: space-between;
+        }
+        
+        .card {
+            background-color: var(--card);
+            border-radius: 0.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 650px;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            border: 1px solid #181818;
+            position: relative;
+            transform-origin: center center;
+            overflow: hidden; /* Prevent children from overflowing */
+            box-sizing: border-box; /* Include padding and border in the element's width and height */
+        }
+        
+        /* Always-on Outer Glow for Main Card */
+        .card:before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary), transparent, var(--secondary));
+            z-index: -1; 
+            border-radius: 0.9rem;
+            opacity: 0.4; /* Always visible, subtle */
+            transition: opacity 0.4s ease-out;
+            pointer-events: none; /* Ensure it doesn't block interactions */
+        }
+        
+        .card:hover:before {
+            opacity: 0.7; /* Intensify on hover */
+        }
+
+        /* Inner Glow for Main Card when Expanded */
+        .main-card:after {
+            content: "";
+            position: absolute;
+            inset: 1px; /* Creates a 1px gap for the border, effectively inside */
+            border-radius: inherit; /* Match parent card's rounding */
+            background: linear-gradient(165deg, rgba(0,163,255,0.2), rgba(0,193,110,0.2));
+            z-index: 0; /* Behind content, on top of card background */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out 0.3s; /* Delayed appearance */
+            pointer-events: none; /* Ensure it doesn't block interactions */
+        }
+
+        .expanded .main-card:after {
+            opacity: 1; /* Show inner glow when expanded */
+        }
+        
+        .expanded .main-card {
+            transform: translateX(-20%) scale(0.95);
+        }
+        
+        .catalog-container {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 400px;
+            opacity: 0;
+            transform: translateX(100px) scale(0.9);
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .expanded .catalog-container {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: all;
+        }
+        
+        .catalog-card {
+            background-color: var(--card);
+            border-radius: 0.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 1.25rem;
+            border: 1px solid #181818;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        
+        .expanded .catalog-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .expanded .catalog-card:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+        
+        .expanded .catalog-card:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+        
+        .expanded .catalog-card:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+        
+        /* Always-on Outer Glow for Catalog Cards */
+        .catalog-card:before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            border-radius: 0.9rem;
+            opacity: 0.4; /* Always visible, subtle */
+            transition: opacity 0.4s ease-out;
+        }
+        
+        .catalog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+        
+        .catalog-card:hover:before {
+            opacity: 0.7; /* Intensify on hover */
+        }
+        
+        .dc-universe-card:before {
+            background: linear-gradient(45deg, var(--dc-universe), transparent);
+        }
+        
+        .star-wars-card:before {
+            background: linear-gradient(45deg, var(--star-wars), transparent);
+        }
+        
+        .catalog-logo, .card-header, .card-body, .card-footer {
+            position: relative; /* Ensure content is above pseudo-elements */
+            z-index: 1;
+        }
+        
+        .catalog-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--text);
+            background: rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dc-universe-logo {
+            background: linear-gradient(135deg, var(--dc-universe), #2a0010);
+        }
+        
+        .star-wars-logo {
+            background: linear-gradient(135deg, var(--star-wars), #443b00);
+            color: #000;
+        }
+        
+        .catalog-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .catalog-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .install-catalog-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .dc-universe-btn {
+            background: linear-gradient(135deg, var(--dc-universe) 0%, var(--dc-universe-hover) 100%);
+        }
+        
+        .star-wars-btn {
+            background: linear-gradient(135deg, var(--star-wars) 0%, var(--star-wars-hover) 100%);
+            color: #000;
+        }
+        
+        .install-catalog-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 163, 255, 0.3); /* Default primary color shadow */
+        }
+        .dc-universe-btn:hover { box-shadow: 0 6px 15px rgba(255,0,72,0.3); }
+        .star-wars-btn:hover { box-shadow: 0 6px 15px rgba(255,232,31,0.3); }
+        
+        .card-header {
+            padding: 1.5rem 1.5rem 1rem;
+            text-align: center;
+            /* position: relative; z-index: 1 already added above */
+        }
+        
+        .logo {
+            max-width: 180px;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-body {
+            padding: 1.5rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            overflow: visible;
+            /* position: relative; z-index: 1 already added above */
+        }
+        
+        .card-body > p {
+            margin-bottom: 0;
+        }
+        
+        .card-body .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .providers {
+            background-color: rgba(15, 15, 15, 0.7);
+            border-radius: 0.6rem;
+            padding: 1rem;
+            margin-bottom: 0;
+            margin-top: 0;
+            border: 1px solid var(--border);
+            height: 100%;
+        }
+        
+        .providers h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+        
+        .provider-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .provider-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .provider-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .showbox-icon {
+            background: linear-gradient(135deg, #ff7a00, #ff0050);
+        }
+        
+        .xprime-icon {
+            background: linear-gradient(135deg, #00a3ff, #00c16e);
+        }
+        
+        .hollymovie-icon {
+            background: linear-gradient(135deg, #e50914, #831010);
+        }
+        
+        .soapertv-icon {
+            background: linear-gradient(135deg, #3498db, #2980b9); /* Blue gradient for Soaper TV */
+        }
+        
+        .cuevana-icon {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad); /* Purple gradient for Cuevana */
+        }
+        
+        .hianime-icon {
+            background: linear-gradient(135deg, #ff3a3a, #ff7c7c); /* Red gradient for Hianime */
+        }
+        
+        .coming-soon-icon {
+            background: linear-gradient(135deg, #6742d9, #9f7aea);
+        }
+        
+        .provider-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        
+        .provider-detail {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-left: 0.5rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+        
+        .coming-soon {
+            font-size: 0.7rem;
+            color: #9f7aea;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .provider-info-note {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0;
+            text-align: left;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            background-color: rgba(15, 15, 15, 0.4);
+            border-radius: 0.6rem;
+            border: 1px solid var(--border);
+            height: calc(100% - 1rem);
+        }
+        
+        .provider-info-note .info-icon {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+            color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .disclaimer {
+            background-color: rgba(15, 15, 15, 0.7);
+            border-radius: 0.6rem;
+            padding: 1rem;
+            margin: 0;
+            border: 1px solid var(--border);
+            position: relative;
+            grid-column: 1 / -1; /* Make it span full width */
+        }
+        
+        .disclaimer-header {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+        }
+        
+        .disclaimer-icon {
+            margin-right: 0.4rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+        
+        .disclaimer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        .disclaimer-content p {
+            flex: 1;
+            min-width: 240px;
+            margin-bottom: 0;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            grid-column: 1 / -1;
+        }
+        
+        .btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.7rem 1rem;
+            border-radius: 0.6rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            outline: none;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 163, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-hover) 100%);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 193, 110, 0.3);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.7rem 1.5rem;
+            background-color: rgba(10, 10, 10, 0.95);
+            color: white;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 400;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border-left: 3px solid var(--primary);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            width: calc(100% - 2rem);
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+        
+        .card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            background-color: rgba(15, 15, 15, 0.5);
+            /* position: relative; z-index: 1 already added above */
+        }
+        
+        .footer-text {
+            color: var(--text-light);
+            font-size: 0.75rem;
+            font-weight: 300;
+            margin-bottom: 0.6rem;
+        }
+        
+        .more-addons-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.75rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .more-addons-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 163, 255, 0.3);
+        }
+        
+        .more-addons-btn .arrow {
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .expanded .more-addons-btn .arrow {
+            transform: rotate(180deg);
+        }
+        
+        .github-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .github-link:hover {
+            color: var(--text);
+        }
+        
+        .close-catalog {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0);
+            z-index: 3;
+        }
+        
+        .expanded .close-catalog {
+            opacity: 1;
+            transform: scale(1);
+            transition-delay: 0.3s;
+        }
+        
+        .close-catalog:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 900px) {
+            .cards-container.expanded {
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+            }
+            
+            .expanded .main-card {
+                transform: translateY(-2%) scale(0.95);
+            }
+            
+            .catalog-container {
+                position: relative;
+                width: 100%;
+                max-width: 400px;
+                margin-top: 1rem;
+            }
+            
+            .providers, .provider-info-note {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .card-body {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1rem 1.25rem 1.5rem;
+            }
+            
+            .card {
+                max-width: 400px;
+                overflow: hidden;
+            }
+            
+            .disclaimer-content {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .disclaimer-content p {
+                min-width: 100%;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .cookie-form {
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo {
+                max-width: 150px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            
+            .how-to-get-btn {
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .cookie-config-container {
+                margin-bottom: 0.75rem;
+                width: 100%;
+            }
+
+            .provider-info-note, .providers {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .cards-container {
+                padding: 0;
+                max-width: 100vw;
+                width: 100vw;
+            }
+            
+            .card {
+                border-radius: 0;
+                max-width: 100%;
+                width: 100vw;
+                margin: 0;
+                border-left: none;
+                border-right: none;
+                overflow: visible; /* Allow card to expand with content */
+            }
+            
+            .card:before {
+                border-radius: 0;
+                opacity: 0.3;
+            }
+            
+            .card-body {
+                padding: 0.75rem 1rem 1.25rem;
+                gap: 0.75rem;
+            }
+            
+            .card-header {
+                padding: 1.25rem 1.25rem 0.75rem;
+            }
+            
+            .card-footer {
+                padding: 0.75rem 1rem;
+            }
+            
+            .providers, .provider-info-note, .disclaimer {
+                padding: 0.75rem;
+                border-radius: 0.5rem;
+            }
+            
+            .cookie-config {
+                padding: 0.75rem;
+                border-radius: 0.5rem;
+            }
+            
+            .toggle-text {
+                font-size: 0.9rem;
+            }
+            
+            .recommended-tag {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .toast {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+                width: calc(100% - 1.5rem);
+                bottom: 1rem;
+            }
+            
+            /* Adjust long text fields */
+            .manifest-url-box span {
+                font-size: 0.7rem;
+            }
+            
+            .provider-detail {
+                display: none; /* Hide provider details on very small screens */
+            }
+            
+            .cookie-input, #regionSelector {
+                font-size: 0.8rem;
+                padding: 0.6rem 0.75rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .video-tutorial-panel {
+                width: 100%;
+                right: -100%;
+                padding: 15px;
+            }
+            
+            .video-tutorial-panel.show {
+                right: 0;
+            }
+            
+            .step-text {
+                font-size: 0.85rem;
+            }
+            
+            .close-tutorial {
+                font-size: 1.8rem;
+                padding: 5px;
+            }
+            
+            /* Fix for personalized addon section */
+            .manifest-result {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .manifest-url-box {
+                padding: 0.75rem;
+            }
+            
+            .manifest-url-box span {
+                font-size: 0.75rem;
+                line-height: 1.3;
+            }
+            
+            .copy-btn {
+                width: 100%;
+                padding: 0.6rem 0;
+            }
+            
+            #personalizedManifest {
+                margin-bottom: 1rem;
+            }
+            
+            .cookie-config {
+                overflow: visible;
+            }
+        }
+
+        /* Nuvio App Card Styles */
+        .nuvio-app-card {
+            border: 1px solid rgba(140, 82, 255, 0.3);
+            position: relative;
+            overflow: visible;
+            animation: pulse 2s infinite;
+        }
+        
+        .nuvio-app-card:before {
+            background: linear-gradient(45deg, var(--nuvio-app), var(--primary), var(--secondary));
+            background-size: 200% 200%;
+            animation: gradientFlow 10s ease infinite;
+        }
+        
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(140, 82, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(140, 82, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(140, 82, 255, 0); }
+        }
+        
+        .nuvio-app-logo {
+            background: linear-gradient(135deg, var(--nuvio-app), #3a1980);
+            transform: scale(1.1);
+            position: relative;
+        }
+        
+        .nuvio-app-btn {
+            background: linear-gradient(135deg, var(--nuvio-app) 0%, var(--nuvio-app-hover) 100%);
+        }
+        
+        .nuvio-app-btn:hover {
+            box-shadow: 0 6px 15px rgba(140, 82, 255, 0.4);
+        }
+        
+        .new-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #ff3a3a, #ff7c7c);
+            color: white;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(255, 58, 58, 0.3);
+            z-index: 2;
+            transform: rotate(5deg);
+            letter-spacing: 0.5px;
+        }
+        
+        /* Cookie Configuration Styles */
+        .cookie-config-container {
+            margin-bottom: 1.25rem;
+        }
+
+        .cookie-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            font: inherit;
+            cursor: pointer;
+            outline: inherit;
+            font-size: 1rem;
+            color: var(--text);
+            margin-right: 0.5rem;
+        }
+
+        .toggle-icon {
+            margin-right: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .toggle-text {
+            font-weight: 500;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .recommended-tag {
+            background: linear-gradient(135deg, #ff3a3a, var(--primary));
+            border-radius: 0.3rem;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 2px 6px rgba(255, 58, 58, 0.3);
+            animation: pulse-tag 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+        }
+        
+        @keyframes pulse-tag {
+            0% { box-shadow: 0 0 0 0 rgba(255, 58, 58, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 58, 58, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 58, 58, 0); }
+        }
+
+        .cookie-config {
+            background-color: rgba(15, 15, 15, 0.7);
+            border-radius: 0.6rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            max-height: 700px;
+            opacity: 1;
+            transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out, padding 0.5s ease-in-out;
+        }
+        
+        .cookie-config p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .cookie-config.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-top-width: 0;
+            border-bottom-width: 0;
+            margin-bottom: 0;
+        }
+
+        .cookie-form {
+            display: grid;
+            grid-template-columns: 1fr 0.4fr;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .cookie-form .button-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .cookie-input {
+            padding: 0.65rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background-color: rgba(20, 20, 20, 0.9);
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .cookie-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 163, 255, 0.2);
+        }
+
+        .personalized-manifest {
+            margin-top: 1rem;
+        }
+
+        .manifest-result {
+            background-color: rgba(10, 10, 10, 0.8);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid rgba(0, 163, 255, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            overflow: visible;
+        }
+
+        .manifest-result h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .manifest-note {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .manifest-url-box {
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.4rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border);
+            overflow: visible;
+        }
+
+        .manifest-url-box span {
+            width: 100%;
+            font-size: 0.8rem;
+            word-break: break-all;
+            color: var(--primary);
+            line-height: 1.4;
+        }
+
+        .copy-btn {
+            background-color: rgba(0, 163, 255, 0.1);
+            border: 1px solid rgba(0, 163, 255, 0.3);
+            color: var(--primary);
+            border-radius: 0.3rem;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-end;
+            width: auto;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .install-personal-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        /* Video Tutorial Panel Styles */
+        .video-tutorial-panel {
+            position: fixed;
+            right: -420px; /* Start offscreen */
+            top: 0;
+            width: 400px;
+            height: 100%;
+            background-color: rgba(15, 15, 15, 0.95);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+            transition: right 0.4s ease-in-out;
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 2px solid var(--primary);
+        }
+        
+        .video-tutorial-panel.show {
+            right: 0;
+        }
+        
+        .tutorial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tutorial-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .close-tutorial {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .close-tutorial:hover {
+            color: var(--text);
+        }
+        
+        .video-container {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #000;
+            position: relative;
+        }
+        
+        .video-player {
+            width: 100%;
+        }
+        
+        .video-warning-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        
+        .video-warning-overlay span {
+            color: rgba(255, 58, 58, 0.9);
+            font-weight: bold;
+        }
+        
+        .tutorial-steps {
+            margin-bottom: 20px;
+        }
+        
+        .tutorial-steps h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .step {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background-color: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+        
+        .how-to-get-btn {
+            background-color: rgba(0, 163, 255, 0.1);
+            border: 1px solid rgba(0, 163, 255, 0.3);
+            color: var(--primary);
+            border-radius: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 0.5rem;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+        
+        .how-to-get-btn:hover {
+            background-color: rgba(0, 163, 255, 0.2);
+        }
+        
+        .tutorial-warning {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 58, 58, 0.1);
+            border: 1px solid rgba(255, 58, 58, 0.3);
+        }
+        
+        .tutorial-warning h3 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .tutorial-warning p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .tutorial-warning p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Add this new style for the two-column layout */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Style for provider sort dropdowns */
+        .provider-sort-select {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--border);
+            background-color: rgba(20, 20, 20, 0.9);
+            color: var(--text);
+            margin-left: auto; /* Pushes it to the right */
+        }
+        .provider-sort-select:disabled {
+            opacity: 0.5;
+            background-color: rgba(30,30,30,0.7);
+        }
+
+        @media (max-width: 700px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .server-selection-note {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile and touch optimization */
+        @media (hover: none) {
+            /* Increase touch targets for mobile */
+            .btn, .toggle-btn, .how-to-get-btn, .more-addons-btn {
+                min-height: 44px; /* Apple's recommended minimum touch target size */
+            }
+            
+            .cookie-input, #regionSelector {
+                height: 44px;
+            }
+            
+            /* Remove hover effects that don't work well on touch devices */
+            .btn:hover, .how-to-get-btn:hover, .more-addons-btn:hover {
+                transform: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* Region status notification */
+        .region-status-alert {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.8rem 1.5rem;
+            background-color: rgba(255, 100, 50, 0.95);
+            color: white;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 400;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            border-left: 3px solid var(--primary);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            width: calc(100% - 2rem);
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .region-status-alert.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .region-unavailable {
+            color: #ff3a3a;
+            font-weight: 500;
+        }
+        
+        .region-good {
+            color: #00c16e;
+            font-weight: 500;
+        }
+
+        /* Styles for cookie status indicator */
+        .cookie-input-container {
+            position: relative;
+            display: flex; 
+            align-items: center;
+            width: 100%; /* Ensure container takes full width of its grid cell */
+        }
+
+        #cookieStatusIndicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #555; /* Default/neutral gray */
+            margin-right: 8px; 
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            flex-shrink: 0; 
+        }
+
+        #cookieStatusIndicator.valid {
+            background-color: #28a745; /* Green */
+            box-shadow: 0 0 6px #28a745;
+        }
+
+        #cookieStatusIndicator.invalid {
+            background-color: #dc3545; /* Red */
+            box-shadow: 0 0 6px #dc3545;
+        }
+
+        #cookieStatusIndicator.pending {
+            background-color: #ffc107; /* Yellow */
+            box-shadow: 0 0 6px #ffc107;
+            animation: pulse-yellow 1.5s infinite ease-in-out;
+        }
+        
+        @keyframes pulse-yellow {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.25);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+        }
+        
+        .cookie-input-container .cookie-input {
+            flex-grow: 1; /* Make input field take remaining space */
+            margin-right: 0.5rem; /* Add some space before the new check button */
+        }
+
+        /* Styles for the new inline check button */
+        .inline-check-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            background-color: rgba(0, 163, 255, 0.15);
+            border: 1px solid rgba(0, 163, 255, 0.4);
+            color: var(--primary);
+            border-radius: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+
+        .inline-check-btn:hover {
+            background-color: rgba(0, 163, 255, 0.3);
+        }
+
+        .inline-check-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* First add the CSS for the VidSrc icon */
+        .vidsrc-icon {
+            background: linear-gradient(135deg, #2196F3, #03A9F4); /* Blue gradient for VidSrc */
+        }
+
+        .vidzee-icon {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A); /* Green gradient for VidZee */
+        }
+
+        /* Migration Tool Styles */
+        .migration-tool-container {
+            background-color: rgba(255, 100, 50, 0.1);
+            border: 1px solid rgba(255, 100, 50, 0.3);
+            border-radius: 0.6rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            grid-column: 1 / -1; /* Span full width in grid */
+        }
+
+        .migration-tool-container h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ff6432; /* Orange-red for urgency */
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .migration-tool-container p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .migration-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .migration-input {
+            padding: 0.65rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background-color: rgba(20, 20, 20, 0.9);
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .migration-input:focus {
+            border-color: #ff6432;
+            box-shadow: 0 0 0 2px rgba(255, 100, 50, 0.2);
+        }
+
+        .migration-output-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .migration-output {
+            flex-grow: 1;
+            padding: 0.65rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--secondary) !important; /* Green border for success */
+            background-color: rgba(0, 193, 110, 0.05) !important;
+            color: var(--text) !important;
+            font-size: 0.9rem;
+            word-break: break-all;
+            box-shadow: 0 0 0 2px rgba(0, 193, 110, 0.1);
+        }
+
+        /* New Instance Banner Styles */
+        .instance-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #ff3a3a, #ff6432);
+            color: white;
+            text-align: center;
+            padding: 12px 20px;
+            font-weight: 500;
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instance-banner a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        
+        .instance-banner-close {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .instance-banner-close:hover {
+            opacity: 1;
+        }
+        
+        /* Adjust body padding when banner is visible */
+        body.has-instance-banner {
+            padding-top: 50px;
+        }
+        
+        /* Adjust for mobile */
+        @media (max-width: 600px) {
+            .instance-banner {
+                padding: 10px 30px 10px 10px; /* Make room for close button */
+                font-size: 14px;
+            }
+            body.has-instance-banner {
+                padding-top: 40px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Banner for Official Instance -->
+    <div id="officialInstanceBanner" class="instance-banner" style="display: none; background: linear-gradient(135deg, #00c16e, #00a3ff);">
+        🚀 Welcome to the official instance, proudly hosted by <a href="https://elfhosted.com/" style="color: white; text-decoration: underline; font-weight: bold;">ElfHosted</a>! ❤️
+        <button id="closeOfficialBanner" class="instance-banner-close">×</button>
+    </div>
+
+    <!-- Banner for Unofficial Instances -->
+    <div id="unofficialInstanceBanner" class="instance-banner" style="display: none; background: linear-gradient(135deg, #ff3a3a, #ff6432);">
+        ⚠️ This is a community instance. For the official, supported instance, please visit <a href="https://nuviostreams.hayd.uk/" style="color: white; text-decoration: underline; font-weight: bold;">nuviostreams.hayd.uk</a>.
+        <button id="closeUnofficialBanner" class="instance-banner-close">×</button>
+    </div>
+
+    <!-- Remove the Vercel-to-Koyeb Banner -->
+    <div id="instanceBanner" class="instance-banner" style="display: none;">
+        ⚠️ This Vercel instance will shut down soon! Please use our new Koyeb instance: 
+        <a href="https://aesthetic-jodie-tapframe-ab46446c.koyeb.app/" target="_blank">
+            Click here to access the Koyeb instance
+        </a>
+        <button id="closeBanner" class="instance-banner-close">×</button>
+    </div>
+    
+    <div class="cards-container" id="cardsContainer">
+        <div class="card main-card">
+            <div class="elfhosted-badge">Private Instance</div>
+            <div class="card-header">
+                <div class="elfhosted-logo-container">
+                    <img src="https://raw.githubusercontent.com/tapframe/NuvioStreaming/main/assets/titlelogo.png" alt="Nuvio Streams Logo" class="logo" style="max-width: 150px;">
+                    <img src="https://store.elfhosted.com/wp-content/uploads/2024/11/logo.svg" alt="ElfHosted Logo" style="max-width: 80px; height: auto;">
+                </div>
+                <h1>Nuvio Streams <span class="premium-title">ElfHosted Edition</span></h1>
+            </div>
+            <div class="card-body">
+                <!-- REMOVE URGENT MIGRATION TOOL SECTION -->
+                
+                <p class="full-width">Your <strong>private, premium</strong> gateway to high-quality streaming on Stremio. This isolated instance offers enhanced performance, reliability, and all providers fully enabled.</p>
+                
+                <!-- ElfHosted Private Instance Information -->
+                <div class="full-width elfhosted-credits">
+                    <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #fff;">
+                        <span style="font-weight: 600; color: var(--elfhosted-primary-light);"> PREMIUM PRIVATE INSTANCE </span>
+                    </p>
+                    <p style="margin-bottom: 0.75rem; font-size: 0.95rem;">
+                        Your dedicated instance is hosted by <a href="https://elfhosted.com/" target="_blank" style="color: var(--elfhosted-secondary-light); font-weight: 600; text-decoration: none;">ElfHosted</a> and maintained by <a href="https://hayd.uk" target="_blank" style="color: var(--elfhosted-primary-light); font-weight: 600; text-decoration: none;">Hayduk</a>.
+                    </p>
+                    <p style="margin-bottom: 0; font-size: 0.95rem;">
+                        This private instance features <strong style="color: var(--elfhosted-secondary-light);">all providers enabled</strong>, <strong style="color: var(--elfhosted-primary-light);">direct server connections</strong> where possible, and <strong style="color: var(--elfhosted-secondary-light);">dedicated resources</strong> for optimal performance.
+                    </p>
+                </div>
+                
+                <button class="more-addons-btn full-width" id="moreAddonsBtn">
+                    More Addons by TapFrame
+                    <span class="arrow">→</span>
+                </button>
+                
+                <div class="providers">
+                    <h2>Available Providers</h2>
+                    <div class="provider-item">
+                        <div class="provider-icon showbox-icon">💎</div>
+                        <div class="provider-name">ShowBox</div>
+                        <span class="provider-detail">May contain 4K/DV/HDR</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon hianime-icon">🍥</div>
+                        <div class="provider-name">Hianime</div>
+                        <span class="provider-detail">Anime (Dub/Sub)</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon xprime-icon">⚡</div>
+                        <div class="provider-name">Xprime.tv</div>
+                        <span class="provider-detail" style="color: #ff8c00;">Public (w/ API Key) / Self-host</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon hollymovie-icon">🎬</div>
+                        <div class="provider-name">HollyMovieHD</div>
+                        <span class="provider-detail">Multiple Qualities</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon soapertv-icon">🧼</div> 
+                        <div class="provider-name">Soaper TV</div>
+                        <span class="provider-detail">Auto Quality</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon vidzee-icon">📺</div>
+                        <div class="provider-name">VidZee</div>
+                        <span class="provider-detail">Auto Quality</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon cuevana-icon">🇨</div> <!-- Placeholder icon, can be updated -->
+                        <div class="provider-name">Cuevana</div>
+                        <span class="provider-detail">LATAM Provider</span>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-icon vidsrc-icon">🎬</div>
+                        <div class="provider-name">VidSrc</div>
+                        <span class="provider-detail">Auto Quality</span>
+                    </div>
+                </div>
+                
+                <!-- Updated Provider info note for ElfHosted -->
+                <div class="provider-info-note">
+                    <span class="info-icon" style="color: var(--elfhosted-primary-light);">💡</span> 
+                    <span>The flag emoji (e.g., 🇺🇸, 🇬🇧) next to ShowBox stream names indicates the server location, not the content's language.</span>
+                </div>
+
+                <div class="elfhosted-provider-note">
+                    <strong style="color: var(--elfhosted-primary-light);">ElfHosted Premium Benefit:</strong> Your private instance has all providers enabled, including Cuevana, with dedicated resources. Some providers that might be unavailable or throttled on public instances work optimally here.
+                </div>
+
+                <!-- Disclaimer moved from below to here -->
+                <div class="disclaimer">
+                    <div class="disclaimer-header">
+                        <span class="disclaimer-icon">ℹ️</span>
+                        <span>Disclaimer</span>
+                    </div>
+                    <div class="disclaimer-content">
+                    <p>Nuvio Streams is a scraper-based addon that aggregates content from various providers. I do not own or host any of the content provided.</p>
+                        <p>Providers (including ShowBox) may become unavailable without notice. As an independent developer, I'll make every effort to maintain functionality, but sources may stop working unexpectedly.</p>
+                    </div>
+                </div>
+                
+                <!-- Provider Selection Section -->
+                <div class="provider-selection-container full-width" style="margin-top: 1.5rem;">
+                    <h2 style="font-size: 1rem; font-weight: 500; margin-bottom: 0.75rem; color: var(--text); opacity: 0.9;">Customize Your Providers</h2>
+                    <p style="font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem; color: var(--text-light);">
+                        Select the providers you want to use. Unchecking providers can speed up results if you only use specific sources. If all are checked (default), the addon fetches from all.
+                    </p>
+                    <div class="provider-checkbox-list" style="background-color: rgba(15, 15, 15, 0.7); border-radius: 0.6rem; padding: 1rem; border: 1px solid var(--border);">
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerShowbox" name="providerSelect" value="showbox" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerShowbox" style="font-size: 0.9rem;">ShowBox</label>
+                            </div>
+                            <select id="qualityShowbox" name="providerQuality" data-provider="showbox" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerXprime" name="providerSelect" value="xprime" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerXprime" style="font-size: 0.9rem;">Xprime.tv</label>
+                            </div>
+                            <select id="qualityXprime" name="providerQuality" data-provider="xprime" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerCuevana" name="providerSelect" value="cuevana" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerCuevana" style="font-size: 0.9rem;">Cuevana</label>
+                            </div>
+                            <select id="qualityCuevana" name="providerQuality" data-provider="cuevana" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerHollymoviehd" name="providerSelect" value="hollymoviehd" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerHollymoviehd" style="font-size: 0.9rem;">HollyMovieHD</label>
+                            </div>
+                            <select id="qualityHollymoviehd" name="providerQuality" data-provider="hollymoviehd" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerSoapertv" name="providerSelect" value="soapertv" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerSoapertv" style="font-size: 0.9rem;">Soaper TV</label>
+                            </div>
+                            <select id="qualitySoapertv" name="providerQuality" data-provider="soapertv" class="provider-sort-select" disabled>
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerVidzee" name="providerSelect" value="vidzee" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerVidzee" style="font-size: 0.9rem;">VidZee</label>
+                            </div>
+                             <select id="qualityVidzee" name="providerQuality" data-provider="vidzee" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerHianime" name="providerSelect" value="hianime" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerHianime" style="font-size: 0.9rem;">Hianime</label>
+                            </div>
+                            <select id="qualityHianime" name="providerQuality" data-provider="hianime" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                        <div class="provider-checkbox-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="checkbox" id="providerVidsrc" name="providerSelect" value="vidsrc" checked style="margin-right: 0.5rem; accent-color: var(--primary);">
+                                <label for="providerVidsrc" style="font-size: 0.9rem;">VidSrc</label>
+                            </div>
+                             <select id="qualityVidsrc" name="providerQuality" data-provider="vidsrc" class="provider-sort-select">
+                                <option value="all" selected>All Qualities</option>
+                                <option value="480p">480p & Up</option>
+                                <option value="720p">720p & Up</option>
+                                <option value="1080p">1080p & Up</option>
+                            </select>
+                        </div>
+                         <div style="margin-top: 1rem;">
+                            <button id="selectAllProvidersBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: rgba(0, 163, 255, 0.15); border: 1px solid rgba(0, 163, 255, 0.4); color: var(--primary); border-radius: 0.4rem; cursor: pointer; transition: all 0.2s ease; margin-right: 0.5rem;">Select All</button>
+                            <button id="deselectAllProvidersBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: rgba(255, 58, 58, 0.15); border: 1px solid rgba(255, 58, 58, 0.4); color: #ff3a3a; border-radius: 0.4rem; cursor: pointer; transition: all 0.2s ease;">Deselect All</button>
+                            <button id="applyProvidersBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: rgba(0, 193, 110, 0.15); border: 1px solid rgba(0, 193, 110, 0.4); color: var(--secondary); border-radius: 0.4rem; cursor: pointer; transition: all 0.2s ease; margin-left: 0.5rem; float: right;">Apply Selection</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- END NEW: Provider Selection Section -->
+
+                <!-- ScraperAPI Key Input - MOVED OUTSIDE of cookie-config -->
+                <div class="scraper-api-key-container full-width" style="margin-top: 1.5rem;">
+                    <div style="background-color: rgba(15, 15, 15, 0.7); border-radius: 0.6rem; padding: 1rem; border: 1px solid var(--border);">
+                        <label for="scraperApiKeyInput" style="display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.25rem;">ScraperAPI Key (Optional for Xprime):</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <input type="text" id="scraperApiKeyInput" placeholder="Enter your ScraperAPI key" class="cookie-input" style="flex-grow: 1; min-width: 150px;">
+                            <button id="applyScraperApiKeyBtn" class="how-to-get-btn" style="flex-shrink: 0;">Apply Key</button>
+                            <button id="howToGetScraperApiKeyBtn" class="how-to-get-btn" style="flex-shrink: 0;">How to Get</button>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">Xprime requires a ScraperAPI key on this public instance. Alternatively, self-host the addon for direct Xprime access. Leave blank if not using Xprime or if self-hosting.</p>
+                    </div>
+                </div>
+                <!-- End ScraperAPI Key Input -->
+
+                <!-- Add Cookie Configuration Section -->
+                <div class="cookie-config-container full-width">
+                    <div class="cookie-header">
+                        <button id="toggleCookieSection" class="toggle-btn">
+                            <span class="toggle-icon">▼</span>
+                            <span class="toggle-text">Personal Cookie Configuration</span>
+                        </button>
+                        <span class="recommended-tag">Extremely Recommended</span>
+                    </div>
+                    
+                    <div class="cookie-config" id="cookieConfigSection">
+                        <p>ShowBox fetches content from a cloud storage provider called FebBox. Each FebBox user gets 100GB/month of fast streaming before speeds are reduced.</p>
+                        <p><strong>Why use your own cookie?</strong> Without personalization, you'll share cookies with other addon users, which can exhaust the 100GB quota quickly and result in slow or failed streams. When not using a personal cookie, ShowBox streams are limited to sizes below 9GB.</p>
+                        
+                        <div class="cookie-form">
+                            <div class="cookie-input-container">
+                                <span id="cookieStatusIndicator" class="cookie-status-indicator"></span>
+                            <input type="text" id="cookieInput" placeholder="Enter your token" class="cookie-input">
+                                <button id="checkCookieBtn" class="inline-check-btn">Check</button>
+                            </div>
+                            <!-- Server Region Selector -->
+                            <select id="regionSelector" class="cookie-input">
+                                <option value="USA7">US East</option>
+                                <option value="USA6">US West</option>
+                                <option value="USA5">US Middle</option>
+                                <option value="UK3">United Kingdom</option>
+                                <option value="CA1">Canada</option>
+                                <option value="FR1">France</option>
+                                <option value="DE2">Germany</option>
+                                <option value="HK1">Hong Kong</option>
+                                <option value="IN1">India</option>
+                                <option value="AU1">Australia</option>
+                                <option value="SZ">China</option>
+                            </select>
+                            <div class="button-group">
+                            <button id="setCookieBtn" class="btn btn-secondary">Set Cookie</button>
+                            <button id="howToGetBtn" class="how-to-get-btn">How to Get</button>
+                            </div>
+                        </div>
+                        
+                        <p class="server-selection-note" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                            <strong>Server Selection:</strong> Choose the server region closest to your physical location for best performance. Different regions may have different content availability and speed. If a region doesn't work well, try another one. <span style="color: #00c16e;">The system will automatically fall back to a US server if your selected region is unavailable.</span>
+                        </p>
+
+                        <!-- ScraperAPI Key Input was here, MOVED OUT -->
+                        
+                    </div> <!-- This is the closing div for id="cookieConfigSection" -->
+                </div> <!-- This is the closing div for class="cookie-config-container full-width" -->
+                <!-- End Cookie Configuration Section -->
+
+                <!-- Personalized Manifest Section - MOVED OUTSIDE of cookie-config -->
+                <div id="personalizedManifest" class="personalized-manifest full-width" style="margin-top: 1.5rem;">
+                    <div class="manifest-result" style="display:none;">
+                        <h4>Your Personalized Addon</h4>
+                        <p class="manifest-note">This URL is unique to you and includes your cookie and server region. Keep it private.</p>
+                        <div class="manifest-url-box">
+                            <span id="personalManifestUrl"></span>
+                        </div>
+                        <div style="display: flex; margin-top: 0.75rem; gap: 0.5rem;">
+                            <a href="/configure" id="configureLink" class="copy-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; cursor: pointer;">
+                                <span style="margin-right: 0.25rem;">⚙️</span> Configure Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Personalized Manifest Section -->
+                
+                <div class="buttons">
+                    <a href="#" id="installLink" class="btn btn-primary">Install Addon</a>
+                    <button id="copyLink" class="btn btn-secondary">Copy Manifest</button>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span class="footer-text">Nuvio Streams Addon • <span style="color: var(--elfhosted-primary-light);">ElfHosted Premium Edition</span></span>
+                <div class="footer-text">
+                    Developed by <a href="https://github.com/tapframe" target="_blank" class="github-link">TapFrame</a> 
+                    <span style="margin: 0 0.5rem;">•</span>
+                    Hosted by <a href="https://elfhosted.com" target="_blank" class="github-link" style="color: var(--elfhosted-secondary-light);">ElfHosted</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="catalog-container">
+            <button class="close-catalog" id="closeCatalog">×</button>
+            
+            <div class="catalog-card dc-universe-card">
+                <div class="catalog-logo dc-universe-logo">⚡</div>
+                <h3 class="catalog-title">DC Universe Catalog</h3>
+                <p class="catalog-desc">Explore the complete DC Universe with this catalog addon for Stremio. Discover movies, TV shows, and animated content from the world of DC Comics.</p>
+                <a href="https://addon-dc-cq85.onrender.com/configure" target="_blank" class="install-catalog-btn dc-universe-btn">Install Addon</a>
+            </div>
+            
+            <div class="catalog-card star-wars-card">
+                <div class="catalog-logo star-wars-logo">✦</div>
+                <h3 class="catalog-title">Star Wars Universe</h3>
+                <p class="catalog-desc">Journey to a galaxy far, far away with this comprehensive Star Wars catalog addon. Includes movies, series, and animated shows from the Star Wars universe.</p>
+                <a href="https://addon-star-wars-u9e3.onrender.com/configure" target="_blank" class="install-catalog-btn star-wars-btn">Install Addon</a>
+            </div>
+            
+            <!-- New Nuvio App Promo -->
+            <div class="catalog-card nuvio-app-card">
+                <div class="new-badge">Coming Soon</div>
+                <div class="catalog-logo nuvio-app-logo">📱</div>
+                <h3 class="catalog-title">Nuvio Streaming App</h3>
+                <p class="catalog-desc">Experience the power of Nuvio on your mobile device! Our upcoming iOS and Android app features more built-in providers and an enhanced streaming experience.</p>
+                <a href="https://github.com/tapframe/NuvioStreaming" target="_blank" class="install-catalog-btn nuvio-app-btn">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Manifest link copied to clipboard!</div>
+    <div id="regionStatusAlert" class="region-status-alert">Region status message</div>
+
+    <div class="video-tutorial-panel" id="videoTutorialPanel">
+        <div class="tutorial-header">
+            <h2 class="tutorial-title">How to Get a FebBox Cookie</h2>
+            <button class="close-tutorial" id="closeTutorial">×</button>
+        </div>
+        <div class="video-container">
+            <iframe class="video-player" src="https://drive.google.com/file/d/1sP7AcxBRZWSgYT3rdOD5_gJsBODEkTSe/preview" allowfullscreen frameborder="0"></iframe>
+        </div>
+        <div class="tutorial-steps">
+            <h3>Text Instructions:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Log in to FebBox using your Google account at <a href="https://www.febbox.com" target="_blank">www.febbox.com</a></div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Right-click anywhere on the page and select "Inspect" or "Inspect Element"</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">Navigate to the "Application" tab in the developer tools</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">In the left sidebar, expand "Storage" → "Cookies" and select "febbox.com"</div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-text">Scroll down through the list of cookies until you find one named "ui"</div>
+            </div>
+            <div class="step">
+                <div class="step-number">6</div>
+                <div class="step-text">Copy the value of this cookie (it starts with 'ey' usually) and paste it into the cookie input field</div>
+            </div>
+        </div>
+        <div class="tutorial-warning">
+            <h3>Important Notice:</h3>
+            <p>As an independent developer, I want to make it clear that Nuvio Streams is just a scraper addon. Providers like ShowBox may disappear without notice for reasons beyond my control.</p>
+            <p>I'll do my best to maintain this addon, but can't guarantee all sources will always work. Using your own cookie is the best way to maximize reliability while sources are available.</p>
+        </div>
+    </div>
+
+    <!-- NEW: ScraperAPI Key Tutorial Panel -->
+    <div class="video-tutorial-panel" id="scraperApiTutorialPanel">
+        <div class="tutorial-header">
+            <h2 class="tutorial-title">How to Get a ScraperAPI Key</h2>
+            <button class="close-tutorial" id="closeScraperApiTutorial">×</button>
+        </div>
+        <div class="tutorial-steps">
+            <h3>Text Instructions:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Go to <a href="https://www.scraperapi.com/" target="_blank" style="color: var(--primary);">www.scraperapi.com</a>.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Click on "Sign Up" (usually in the top right corner) and create an account, for example, by using your Google account.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">After signing up and logging in, find your API Key. It's typically displayed on your dashboard.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">ScraperAPI provides a free plan that usually includes 1,000 API credits per month, which reset automatically.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-text">Copy this API Key and paste it into the "ScraperAPI Key" input field on the Nuvio Streams configuration page.</div>
+            </div>
+        </div>
+        <div class="tutorial-warning">
+            <h3>Important Notice for Xprime:</h3>
+            <p>Using a ScraperAPI key is one way to access Xprime.tv streams on this public Nuvio Streams instance. This helps bypass potential blocking that Xprime might implement.</p>
+            <p>However, this is not a guaranteed long-term solution. Access through ScraperAPI can become unreliable if ScraperAPI itself is blocked by Xprime, if your free credits run out, or if ScraperAPI changes its service terms.</p>
+            <p><strong>For the most stable and reliable Xprime access, self-hosting this addon is strongly recommended.</strong> When self-hosting, you can configure your own proxy solutions or attempt direct access, bypassing the need for a third-party service like ScraperAPI for Xprime.</p>
+            <p style="margin-top: 10px; font-style: italic;"><strong>Disclaimer:</strong> This project is not associated with ScraperAPI in any way. The ScraperAPI service is utilized here solely as a technical means to facilitate the scraping of links, which is necessary for accessing content from certain providers on this public instance.</p>
+        </div>
+    </div>
+    <!-- END NEW: ScraperAPI Key Tutorial Panel -->
+
+    <script>
+        const cardsContainer = document.getElementById('cardsContainer');
+        const moreAddonsBtn = document.getElementById('moreAddonsBtn');
+        const closeCatalog = document.getElementById('closeCatalog');
+        const installLink = document.getElementById('installLink');
+        const copyLinkBtn = document.getElementById('copyLink');
+        const toast = document.getElementById('toast');
+
+        // --- Default Manifest Setup ---
+        const defaultManifestUrl = window.location.origin + '/manifest.json';
+        const defaultInstallProtocolUrl = 'stremio://' + defaultManifestUrl.replace(/^https?:\/\//, '');
+        
+        let currentManifestUrlToCopy = defaultManifestUrl;
+        let currentInstallUrl = defaultInstallProtocolUrl;
+
+        if (installLink) {
+            installLink.href = currentInstallUrl; // Set initial href
+
+            installLink.addEventListener('click', () => {
+                if (currentInstallUrl === defaultInstallProtocolUrl) {
+                    toast.innerHTML = "Installing with default settings.<br>Note: ShowBox streams are limited to &lt;9GB. Use a personal cookie for full access to all formats (HDR/DV etc.).";
+                    toast.classList.add('show');
+                    // Keep toast longer for this important message
+                    setTimeout(() => { toast.classList.remove('show'); }, 6000); 
+                }
+                // Allow default link behavior to proceed
+            });
+        }
+
+        if (copyLinkBtn) {
+            copyLinkBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(currentManifestUrlToCopy);
+                    if (currentManifestUrlToCopy === defaultManifestUrl) {
+                        toast.innerHTML = "Default manifest copied!<br>Note: ShowBox streams are limited to &lt;9GB. Use a personal cookie for full access.";
+                        setTimeout(() => { toast.classList.remove('show'); }, 5000); // Longer display
+                    } else {
+                        toast.textContent = "Personalized manifest link copied!";
+                        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                    }
+                    toast.classList.add('show');
+                } catch (err) {
+                    console.error('Failed to copy manifest: ', err);
+                    toast.textContent = "Failed to copy link.";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                }
+            });
+        }
+
+        // --- UI Interaction for More Addons (unchanged) ---
+        const handleMoreAddonsClick = function() {
+            if (cardsContainer) {
+                cardsContainer.classList.toggle('expanded');
+            }
+        };
+
+        const handleCloseCatalogClick = function() {
+            if (cardsContainer) {
+                cardsContainer.classList.remove('expanded');
+            }
+        };
+
+        function updateLayoutForScreenSize() {
+            const isMobile = window.innerWidth <= 900;
+
+            if (isMobile) {
+                if (cardsContainer) cardsContainer.classList.add('expanded');
+                if (moreAddonsBtn) moreAddonsBtn.style.display = 'none';
+                if (closeCatalog) closeCatalog.style.display = 'none';
+
+                // Remove desktop event listeners if they were attached
+                if (moreAddonsBtn) moreAddonsBtn.removeEventListener('click', handleMoreAddonsClick);
+                if (closeCatalog) closeCatalog.removeEventListener('click', handleCloseCatalogClick);
+
+            } else { // Desktop view
+                if (moreAddonsBtn) moreAddonsBtn.style.display = 'inline-flex';
+                // For closeCatalog, CSS handles visibility based on .expanded, 
+                // so just ensure it's not explicitly set to 'none' from mobile view.
+                if (closeCatalog) closeCatalog.style.display = ''; 
+                
+                // Add/Re-add desktop event listeners (ensuring no duplicates)
+                if (moreAddonsBtn) {
+                    moreAddonsBtn.removeEventListener('click', handleMoreAddonsClick); 
+                    moreAddonsBtn.addEventListener('click', handleMoreAddonsClick);
+                }
+                if (closeCatalog) {
+                    closeCatalog.removeEventListener('click', handleCloseCatalogClick); 
+                    closeCatalog.addEventListener('click', handleCloseCatalogClick);
+                }
+            }
+        }
+
+        // Initial layout update
+        updateLayoutForScreenSize();
+
+        // Update layout on window resize
+        window.addEventListener('resize', updateLayoutForScreenSize);
+
+        // --- New Cookie Configuration Functionality (Client-Side Only) ---
+        const cookieInput = document.getElementById('cookieInput');
+        const regionSelector = document.getElementById('regionSelector');
+        const setCookieBtn = document.getElementById('setCookieBtn');
+        const manifestResult = document.querySelector('.manifest-result');
+        const personalManifestUrlSpan = document.getElementById('personalManifestUrl');
+        const checkCookieBtn = document.getElementById('checkCookieBtn'); // Get the new check button
+
+        // --- Add new elements for cookie status ---
+        const cookieStatusIndicator = document.getElementById('cookieStatusIndicator');
+        const cookieConfigSection = document.getElementById('cookieConfigSection');
+        const cookieConfigContainer = document.querySelector('.cookie-config-container');
+
+        // --- NEW: Provider Selection Elements ---
+        const providerCheckboxes = document.querySelectorAll('input[name="providerSelect"]');
+        const selectAllProvidersBtn = document.getElementById('selectAllProvidersBtn');
+        const deselectAllProvidersBtn = document.getElementById('deselectAllProvidersBtn');
+        const applyProvidersBtn = document.getElementById('applyProvidersBtn'); // This button will now use the new function
+        const totalProviders = providerCheckboxes.length;
+        const providerQualitySelects = document.querySelectorAll('select[name="providerQuality"]');
+        const scraperApiKeyInput = document.getElementById('scraperApiKeyInput'); // Get the ScraperAPI input
+        const applyScraperApiKeyBtn = document.getElementById('applyScraperApiKeyBtn'); // NEW: Get the Apply Scraper API Key button
+
+        // Get reference to ShowBox checkbox specifically
+        const showboxCheckbox = document.getElementById('providerShowbox');
+        const xprimeCheckbox = document.getElementById('providerXprime'); // Get Xprime checkbox
+        const vidzeeCheckbox = document.getElementById('providerVidzee'); // NEW: Get VidZee checkbox
+
+        // Function to update region selector enabled state based on cookie validity
+        function updateRegionSelectorState() {
+            const isCookieValid = cookieStatusIndicator.classList.contains('valid');
+            if (regionSelector) {
+                regionSelector.disabled = !isCookieValid;
+                if (!isCookieValid) {
+                    // If cookie is not valid, set region to a US option
+                    // Look for USA7 first, then any USA option
+                    const usa7Option = Array.from(regionSelector.options).find(opt => opt.value === 'USA7');
+                    if (usa7Option) {
+                        regionSelector.value = 'USA7';
+                    } else {
+                        // Find any USA option as fallback
+                        const usaOption = Array.from(regionSelector.options).find(opt => opt.value.startsWith('USA'));
+                        if (usaOption) {
+                            regionSelector.value = usaOption.value;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Function to update cookie section based on ShowBox selection
+        function updateCookieSectionState() {
+            const isShowBoxSelected = showboxCheckbox && showboxCheckbox.checked;
+            
+            if (cookieConfigContainer) {
+                if (!isShowBoxSelected) {
+                    // If ShowBox is not selected, disable and collapse cookie section
+                    cookieConfigContainer.style.opacity = '0.5';
+                    cookieConfigContainer.style.pointerEvents = 'none';
+                    cookieInput.disabled = true;
+                    regionSelector.disabled = true;
+                    setCookieBtn.disabled = true;
+                    checkCookieBtn.disabled = true;
+                    // Optionally collapse it
+                    if (cookieConfigSection && !cookieConfigSection.classList.contains('collapsed')) {
+                        cookieConfigSection.classList.add('collapsed');
+                        // Update toggle button if it exists
+                        const toggleBtn = document.getElementById('toggleCookieSection');
+                        if (toggleBtn) toggleBtn.classList.add('collapsed');
+                    }
+                } else {
+                    // If ShowBox is selected, enable cookie section
+                    cookieConfigContainer.style.opacity = '1';
+                    cookieConfigContainer.style.pointerEvents = 'auto';
+                    cookieInput.disabled = false;
+                    checkCookieBtn.disabled = cookieInput.value.trim() === '';
+                    // Only update region selector and set cookie button based on cookie validity
+                    updateRegionSelectorState();
+                     // Also ensure quality dropdowns are updated based on provider selections
+                    updateQualityDropdownStates(); // Changed call
+                }
+            }
+        }
+
+        // --- NEW: Function to enable/disable ScraperAPI key input based on Xprime selection ---
+        function updateScraperApiKeyInputState() {
+            if (scraperApiKeyInput && xprimeCheckbox) {
+                if (xprimeCheckbox.checked) {
+                    scraperApiKeyInput.disabled = false;
+                    scraperApiKeyInput.style.opacity = '1';
+                } else {
+                    scraperApiKeyInput.disabled = true;
+                    scraperApiKeyInput.style.opacity = '0.6';
+                }
+            }
+        }
+
+        // --- NEW: Centralized function to regenerate the personalized manifest URL ---
+        async function regeneratePersonalizedManifest() {
+            const cookieValue = cookieInput.value.trim();
+            const regionValue = regionSelector ? regionSelector.value : null;
+            const scraperApiKeyValue = scraperApiKeyInput.value.trim();
+
+            const selectedProviders = [];
+            providerCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedProviders.push(checkbox.value);
+                }
+            });
+
+            const qualityPreferences = {};
+            let hasQualityPreferences = false;
+            providerCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const providerValue = checkbox.value;
+                    const qualityDropdown = document.getElementById(`quality${providerValue.charAt(0).toUpperCase() + providerValue.slice(1)}`);
+                    if (qualityDropdown && qualityDropdown.value !== 'all') {
+                        qualityPreferences[providerValue] = qualityDropdown.value;
+                        hasQualityPreferences = true;
+                    }
+                }
+            });
+
+            // Build the path components for the new URL format
+            let pathParams = [];
+            let queryParams = [];
+            let manifestPersonalized = false;
+
+            // Cookie and Region handling: Only add if ShowBox is selected AND cookie is valid
+            const isShowBoxSelected = showboxCheckbox && showboxCheckbox.checked;
+            const isCookieValid = cookieStatusIndicator.classList.contains('valid');
+
+            if (isShowBoxSelected && cookieValue && isCookieValid) {
+                pathParams.push(`cookie=${encodeURIComponent(cookieValue)}`);
+                queryParams.push(`cookie=${encodeURIComponent(cookieValue)}`);
+                if (regionValue) {
+                    pathParams.push(`region=${regionValue}`);
+                    queryParams.push(`region=${regionValue}`);
+                }
+                manifestPersonalized = true;
+            }
+
+            // Providers handling: Only add if a subset is selected
+            if (selectedProviders.length > 0 && selectedProviders.length < totalProviders) {
+                pathParams.push(`providers=${selectedProviders.join(',')}`);
+                queryParams.push(`providers=${selectedProviders.join(',')}`);
+                manifestPersonalized = true;
+            }
+
+            // Quality preferences handling
+            if (hasQualityPreferences) {
+                const encodedQualities = encodeURIComponent(JSON.stringify(qualityPreferences));
+                pathParams.push(`min_qualities=${encodedQualities}`);
+                queryParams.push(`min_qualities=${encodedQualities}`);
+                manifestPersonalized = true;
+            }
+
+            // ScraperAPI key handling
+            if (scraperApiKeyValue) {
+                pathParams.push(`scraper_api_key=${encodeURIComponent(scraperApiKeyValue)}`);
+                queryParams.push(`scraper_api_key=${encodeURIComponent(scraperApiKeyValue)}`);
+                manifestPersonalized = true;
+            }
+
+            // Create both URL formats
+            let pathString = '';
+            if (pathParams.length > 0) {
+                pathString = pathParams.join('/') + '/';
+            }
+            
+            let queryString = '';
+            if (queryParams.length > 0) {
+                queryString = '?' + queryParams.join('&');
+            }
+
+            // Android-compatible URL (path-based format)
+            const newPathManifestURL = `${window.location.origin}/${pathString}manifest.json`;
+            // Legacy URL (query-based format, for backward compatibility)
+            const newQueryManifestURL = `${window.location.origin}/manifest.json${queryString}`;
+            
+            // Generate a configuration URL that preserves all settings
+            const configureUrl = `${window.location.origin}/${pathString}configure`;
+            
+            // Set the URLs for use
+            currentManifestUrlToCopy = newPathManifestURL; // Prefer Android-compatible URL for copying
+            currentInstallUrl = `stremio://${newPathManifestURL.replace(/^https?:\/\//, '')}`;
+            if (installLink) installLink.href = currentInstallUrl;
+            
+            // Update the configure link if it exists
+            const configureLink = document.getElementById('configureLink');
+            if (configureLink) {
+                configureLink.href = configureUrl;
+                configureLink.style.display = manifestPersonalized ? 'block' : 'none';
+            }
+
+            if (manifestPersonalized) {
+                personalManifestUrlSpan.textContent = newPathManifestURL;
+                manifestResult.style.display = 'block';
+                toast.textContent = "Personalized manifest URL updated!";
+            } else {
+                // If no personalization options are active, revert to default and hide section
+                personalManifestUrlSpan.textContent = defaultManifestUrl; // Show default if nothing custom
+                manifestResult.style.display = 'none';
+                currentManifestUrlToCopy = defaultManifestUrl;
+                currentInstallUrl = defaultInstallProtocolUrl;
+                if (installLink) installLink.href = defaultInstallProtocolUrl;
+                toast.textContent = "Manifest reverted to default settings.";
+            }
+            
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // Add event listener for the Apply button (now calls the new function)
+        if (applyProvidersBtn) {
+            applyProvidersBtn.addEventListener('click', regeneratePersonalizedManifest);
+        }
+
+        // --- Event listeners for provider selection ---
+        if (selectAllProvidersBtn) {
+            selectAllProvidersBtn.addEventListener('click', () => {
+                providerCheckboxes.forEach(checkbox => checkbox.checked = true);
+                updateCookieSectionState(); // Update cookie section state
+                updateQualityDropdownStates(); 
+                updateScraperApiKeyInputState(); // Update ScraperAPI input state
+                toast.textContent = "All providers selected. Click 'Apply Selection' to update.";
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            });
+        }
+
+        if (deselectAllProvidersBtn) {
+            deselectAllProvidersBtn.addEventListener('click', () => {
+                providerCheckboxes.forEach(checkbox => checkbox.checked = false);
+                updateCookieSectionState(); // Update cookie section state
+                updateQualityDropdownStates(); 
+                updateScraperApiKeyInputState(); // Update ScraperAPI input state
+                toast.textContent = "All providers deselected. Click 'Apply Selection' to update.";
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            });
+        }
+
+        // Add special handler for the ShowBox checkbox
+        if (showboxCheckbox) {
+            showboxCheckbox.addEventListener('change', () => {
+                updateCookieSectionState();
+                updateQualityDropdownStates();
+                // updateScraperApiKeyInputState(); // Not strictly needed here unless Showbox affects Xprime directly
+                // Instead of direct toast, let user click "Apply" or "Set Cookie" or blur API key
+                // toast.textContent = `Provider selection changed. ${showboxCheckbox.checked ? 'ShowBox enabled, cookie section available.' : 'ShowBox disabled, cookie section disabled.'} Click "Apply Selection" to update manifest.`;
+                // toast.classList.add('show');
+            });
+        }
+
+        providerCheckboxes.forEach(checkbox => {
+            if (checkbox !== showboxCheckbox) { // Skip ShowBox as it has its own handler
+                checkbox.addEventListener('change', () => {
+                    updateQualityDropdownStates();
+                    updateScraperApiKeyInputState(); // Update ScraperAPI input state when any other provider changes
+                    // toast.textContent = `Provider selection changed. Click \"Apply Selection\" to update manifest.`;
+                    // toast.classList.add('show');
+                    // setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                });
+            }
+        });
+        
+        // Add event listener for ScraperAPI key input (on blur)
+        if (scraperApiKeyInput) {
+            scraperApiKeyInput.addEventListener('blur', regeneratePersonalizedManifest);
+        }
+
+        // NEW: Event listener for Apply Scraper API Key button
+        if (applyScraperApiKeyBtn) {
+            applyScraperApiKeyBtn.addEventListener('click', regeneratePersonalizedManifest);
+        }
+
+        // --- Disable Set Cookie button initially ---
+        if (setCookieBtn) {
+            setCookieBtn.disabled = true;
+            setCookieBtn.style.opacity = '0.6'; // Visual cue for disabled state
+            setCookieBtn.style.cursor = 'not-allowed';
+        }
+
+        // --- Debounce function ---
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
+        // --- Function to check cookie validity via backend API ---
+        async function checkCookieOnServer(cookieValue) {
+            if (!cookieValue || cookieValue.length < 10) { // Basic check
+                cookieStatusIndicator.className = 'cookie-status-indicator invalid';
+                if (setCookieBtn) {
+                    setCookieBtn.disabled = true;
+                    setCookieBtn.style.opacity = '0.6';
+                    setCookieBtn.style.cursor = 'not-allowed';
+                }
+                if (checkCookieBtn) checkCookieBtn.disabled = false; // Re-enable check button
+                updateRegionSelectorState(); // Update region selector state
+                return false;
+            }
+
+            cookieStatusIndicator.className = 'cookie-status-indicator pending'; // Set to pending
+            if (setCookieBtn) {
+                setCookieBtn.disabled = true; // Disable while pending
+                setCookieBtn.style.opacity = '0.6';
+                setCookieBtn.style.cursor = 'not-allowed';
+            }
+            if (checkCookieBtn) checkCookieBtn.disabled = true; // Disable check button while pending
+
+            try {
+                // IMPORTANT: You need to create this backend endpoint in your server.js
+                const response = await fetch('/api/validate-cookie', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cookie: cookieValue }),
+                });
+
+                if (!response.ok) {
+                    // Handle HTTP errors (e.g., 500, 404)
+                    const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response' }));
+                    console.error('Server error validating cookie:', response.status, errorData.message);
+                    cookieStatusIndicator.className = 'cookie-status-indicator invalid';
+                    if (setCookieBtn) {
+                         setCookieBtn.disabled = true;
+                         setCookieBtn.style.opacity = '0.6';
+                         setCookieBtn.style.cursor = 'not-allowed';
+                    }
+                    if (checkCookieBtn) checkCookieBtn.disabled = false; // Re-enable check button
+                    toast.textContent = "Not a valid token."; // Generic error message
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 4000);
+                    updateRegionSelectorState(); // Update region selector state
+                    return false;
+                }
+
+                const result = await response.json();
+
+                if (result.isValid) {
+                    cookieStatusIndicator.className = 'cookie-status-indicator valid';
+                    if (setCookieBtn) {
+                        setCookieBtn.disabled = false; // Enable on valid
+                        setCookieBtn.style.opacity = '1';
+                        setCookieBtn.style.cursor = 'pointer';
+                    }
+                    if (checkCookieBtn) checkCookieBtn.disabled = false; // Re-enable check button
+                    updateRegionSelectorState(); // Update region selector state
+                    return true;
+                } else {
+                    cookieStatusIndicator.className = 'cookie-status-indicator invalid';
+                    if (setCookieBtn) {
+                        setCookieBtn.disabled = true; // Disable on invalid
+                        setCookieBtn.style.opacity = '0.6';
+                        setCookieBtn.style.cursor = 'not-allowed';
+                    }
+                    if (checkCookieBtn) checkCookieBtn.disabled = false; // Re-enable check button
+                    // Show generic message instead of result.message
+                    toast.textContent = "Not a valid token."; 
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 4000);
+                    updateRegionSelectorState(); // Update region selector state
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error calling /api/validate-cookie:', error);
+                cookieStatusIndicator.className = 'cookie-status-indicator invalid';
+                if (setCookieBtn) {
+                    setCookieBtn.disabled = true;
+                    setCookieBtn.style.opacity = '0.6';
+                    setCookieBtn.style.cursor = 'not-allowed';
+                }
+                if (checkCookieBtn) checkCookieBtn.disabled = false; // Re-enable check button
+                toast.textContent = "Not a valid token."; // Generic error message
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 4000);
+                updateRegionSelectorState(); // Update region selector state
+                return false;
+            }
+        }
+
+        // --- Event listener for cookie input ---
+        if (cookieInput) {
+            // Check on blur (when user clicks away)
+            cookieInput.addEventListener('blur', () => {
+                const cookieValue = cookieInput.value.trim();
+                if (cookieValue) { // Only check if there's a value
+                    if (!cookieStatusIndicator.classList.contains('pending')) {
+                        checkCookieOnServer(cookieValue);
+                    }
+                } else {
+                    cookieStatusIndicator.className = 'cookie-status-indicator'; 
+                    if (setCookieBtn) {
+                        setCookieBtn.disabled = true; 
+                        setCookieBtn.style.opacity = '0.6';
+                        setCookieBtn.style.cursor = 'not-allowed';
+                    }
+                    if (checkCookieBtn) checkCookieBtn.disabled = true;
+                    updateRegionSelectorState(); // Update region selector state
+                }
+            });
+
+            // Handle input changes for immediate UI feedback and debounced check button state
+            const debouncedUpdateCheckButtonState = debounce(() => {
+                if (checkCookieBtn) {
+                    checkCookieBtn.disabled = (cookieInput.value.trim() === '');
+                }
+            }, 150); // Short debounce for check button enable/disable
+
+            cookieInput.addEventListener('input', () => {
+                const cookieValue = cookieInput.value.trim();
+
+                // Immediate reaction: If the cookie was valid and is now being modified,
+                // reset the status and force re-check before Set Cookie can be used.
+                if (cookieStatusIndicator.classList.contains('valid')) {
+                    cookieStatusIndicator.className = 'cookie-status-indicator'; // Reset to neutral gray
+                    if (setCookieBtn) {
+                        setCookieBtn.disabled = true; // Disable Set Cookie button
+                        setCookieBtn.style.opacity = '0.6';
+                        setCookieBtn.style.cursor = 'not-allowed';
+                    }
+                    
+                    // Also hide personalized manifest and revert main buttons to default
+                    if (manifestResult) manifestResult.style.display = 'none';
+                    currentManifestUrlToCopy = defaultManifestUrl;
+                    currentInstallUrl = defaultInstallProtocolUrl;
+                    if (installLink) installLink.href = currentInstallUrl;
+
+                    if (!toast.textContent.startsWith("Cookie modified")) {
+                        toast.textContent = "Cookie modified. Please 'Check' to re-validate.";
+                        toast.classList.add('show');
+                        setTimeout(() => { 
+                            if (toast.textContent === "Cookie modified. Please 'Check' to re-validate.") {
+                                toast.classList.remove('show'); 
+                            }
+                        }, 3500);
+                    }
+                }
+                
+                // If input becomes empty, also reset Set Cookie button, indicator, and personalized manifest section
+                if (cookieValue === '') {
+                    cookieStatusIndicator.className = 'cookie-status-indicator';
+                     if (setCookieBtn) {
+                        setCookieBtn.disabled = true;
+                        setCookieBtn.style.opacity = '0.6';
+                        setCookieBtn.style.cursor = 'not-allowed';
+                    }
+                    // Hide personalized manifest and revert main buttons if input is cleared
+                    if (manifestResult) manifestResult.style.display = 'none';
+                    currentManifestUrlToCopy = defaultManifestUrl;
+                    currentInstallUrl = defaultInstallProtocolUrl;
+                    if (installLink) installLink.href = currentInstallUrl;
+                }
+
+                // Update check button state (debounced)
+                debouncedUpdateCheckButtonState();
+                
+                // Update region selector state
+                updateRegionSelectorState();
+            }); 
+        }
+
+        // --- Event listener for the new inline check button ---
+        if (checkCookieBtn && cookieInput) {
+            checkCookieBtn.addEventListener('click', () => {
+                const cookieValue = cookieInput.value.trim();
+                if (cookieValue) {
+                    checkCookieOnServer(cookieValue);
+                } else {
+                    toast.textContent = "Please enter a cookie to check.";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                }
+            });
+            // Initially disable if input is empty
+            checkCookieBtn.disabled = (cookieInput.value.trim() === ''); 
+        }
+
+        // Add a listener for region changes
+        if (regionSelector) {
+            regionSelector.addEventListener('change', () => {
+                const regionValue = regionSelector.value;
+                lastSelectedRegion = regionValue;
+                
+                // Reset any error styling on this option
+                const selectedOption = regionSelector.options[regionSelector.selectedIndex];
+                if (selectedOption) {
+                    selectedOption.textContent = selectedOption.textContent.replace(/\s*\(Unavailable\)$/, '');
+                    selectedOption.style.color = '';
+                }
+                
+                toast.textContent = `Region changed to ${regionValue}. Click 'Set Cookie' to apply.`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            });
+            
+            // Initially set disabled state based on cookie existence
+            regionSelector.disabled = true; // Default to disabled
+        }
+
+        if (setCookieBtn) {
+            // Make it async
+            setCookieBtn.addEventListener('click', async () => {
+                const cookieValue = cookieInput.value.trim();
+                // const regionValue = regionSelector.value; // Not needed here, regeneratePersonalizedManifest will get it
+                // const scraperApiKeyValue = document.getElementById('scraperApiKeyInput').value.trim(); // Not needed here
+
+                // Perform server-side cookie validation before generating manifest
+                if (cookieValue) {
+                    const isValid = await checkCookieOnServer(cookieValue);
+                    if (!isValid) {
+                        toast.textContent = "Cookie is invalid. Please check and try again.";
+                        if (!toast.classList.contains('show')) {
+                           toast.classList.add('show');
+                           setTimeout(() => { toast.classList.remove('show'); }, 4000);
+                        }
+                        // Explicitly call regeneratePersonalizedManifest to ensure UI updates if cookie becomes invalid
+                        await regeneratePersonalizedManifest(); 
+                        return; 
+                    }
+                    // If valid, proceed to regenerate manifest which includes the cookie
+                } else {
+                     cookieStatusIndicator.className = 'cookie-status-indicator';
+                     toast.textContent = "Please enter your FebBox cookie.";
+                     toast.classList.add('show');
+                     setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                     await regeneratePersonalizedManifest(); // Update manifest (will revert to default if no cookie)
+                     return;
+                }
+                
+                // All checks passed or cookie is now valid, regenerate the manifest with all settings
+                await regeneratePersonalizedManifest();
+
+                // Store the newly selected region for region status tracking (already done by regenerate)
+                // lastSelectedRegion = regionValue; // Not needed here
+                
+                // Restart region status checking
+                startRegionStatusCheck();
+            });
+        }
+
+        // Function to pre-fill cookie and region from URL query parameters
+        const prefillFromUrl = () => {
+            // Extract parameters from query string
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Extract parameters from path segments (new Android-compatible format)
+            const pathParams = {};
+            const pathSegments = window.location.pathname.split('/').filter(segment => segment);
+            pathSegments.forEach(segment => {
+                const paramParts = segment.split('=');
+                if (paramParts.length === 2) {
+                    const [key, value] = paramParts;
+                    pathParams[key] = value;
+                }
+            });
+            
+            // Prioritize path params over query params for each parameter
+            
+            // Handle cookie parameter
+            const cookieFromUrl = pathParams.cookie || urlParams.get('cookie');
+            const regionFromUrl = pathParams.region || urlParams.get('region');
+            const providersFromUrl = pathParams.providers || urlParams.get('providers');
+            const minQualitiesFromUrl = pathParams.min_qualities || urlParams.get('min_qualities');
+            const scraperApiKeyFromUrl = pathParams.scraper_api_key || urlParams.get('scraper_api_key');
+            
+            // Set cookie and region
+            if (cookieFromUrl && cookieInput) {
+                try {
+                    const decodedCookie = decodeURIComponent(cookieFromUrl);
+                    cookieInput.value = decodedCookie;
+                } catch (e) {
+                    console.error("Error decoding cookie from URL for pre-fill:", e.message);
+                }
+            }
+            
+            if (regionFromUrl && regionSelector) {
+                // Check if the region exists in options
+                const regionExists = Array.from(regionSelector.options).some(option => option.value === regionFromUrl);
+                if (regionExists) {
+                    regionSelector.value = regionFromUrl;
+                }
+            }
+            
+            // Set providers
+            if (providersFromUrl && providerCheckboxes) {
+                const selectedProviders = providersFromUrl.split(',').map(p => p.trim().toLowerCase());
+                
+                // First uncheck all providers
+                providerCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Then check only the selected ones
+                providerCheckboxes.forEach(checkbox => {
+                    if (selectedProviders.includes(checkbox.value.toLowerCase())) {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                // Update UI state based on provider selections
+                updateCookieSectionState();
+                updateQualityDropdownStates();
+                updateScraperApiKeyInputState();
+            }
+            
+            // Set minimum qualities
+            if (minQualitiesFromUrl) {
+                try {
+                    const decodedQualities = decodeURIComponent(minQualitiesFromUrl);
+                    const qualityPreferences = JSON.parse(decodedQualities);
+                    
+                    // Apply quality preferences to dropdowns
+                    Object.keys(qualityPreferences).forEach(provider => {
+                        const qualityDropdown = document.getElementById(`quality${provider.charAt(0).toUpperCase() + provider.slice(1)}`);
+                        if (qualityDropdown) {
+                            qualityDropdown.value = qualityPreferences[provider];
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error parsing min_qualities from URL for pre-fill:", e.message);
+                }
+            }
+            
+            // Set ScraperAPI key
+            if (scraperApiKeyFromUrl && scraperApiKeyInput) {
+                try {
+                    scraperApiKeyInput.value = decodeURIComponent(scraperApiKeyFromUrl);
+                } catch (e) {
+                    console.error("Error decoding ScraperAPI key from URL for pre-fill:", e.message);
+                }
+            }
+            
+            // Automatically validate cookie if one is provided
+            if (cookieFromUrl && cookieInput && cookieInput.value) {
+                // Trigger cookie validation
+                checkCookieOnServer(cookieInput.value);
+                
+                // Generate manifest after a short delay to allow validation to complete
+                setTimeout(() => {
+                    if (setCookieBtn) {
+                        setCookieBtn.click(); // Simulate Set Cookie button click
+                        toast.textContent = "Settings loaded from URL and applied!";
+                        toast.classList.add('show');
+                        setTimeout(() => { toast.classList.remove('show'); }, 3500);
+                    }
+                }, 1000);
+            } else if ((providersFromUrl || minQualitiesFromUrl || scraperApiKeyFromUrl) && applyProvidersBtn) {
+                // If we have any other parameters but no cookie, just apply providers
+                setTimeout(() => {
+                    applyProvidersBtn.click(); // Simulate Apply Selection button click
+                    toast.textContent = "Provider settings loaded from URL and applied!";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3500);
+                }, 500);
+            }
+        };
+
+        // Call prefill function on page load
+        prefillFromUrl();
+
+        // Cookie section toggle functionality
+        const toggleCookieBtn = document.getElementById('toggleCookieSection');
+        
+        if (toggleCookieBtn && cookieConfigSection) {
+            // Set initial state to expanded (remove collapsed class if present from HTML)
+            cookieConfigSection.classList.remove('collapsed');
+            toggleCookieBtn.classList.remove('collapsed');
+            const initialIcon = toggleCookieBtn.querySelector('.toggle-icon');
+            if (initialIcon) initialIcon.textContent = '▼';
+
+            toggleCookieBtn.addEventListener('click', () => {
+                const isCollapsed = cookieConfigSection.classList.toggle('collapsed');
+                toggleCookieBtn.classList.toggle('collapsed', isCollapsed);
+            });
+        }
+
+        // Video tutorial panel functionality
+        const videoTutorialPanel = document.getElementById('videoTutorialPanel');
+        const closeTutorialBtn = document.getElementById('closeTutorial');
+        const howToGetBtn = document.getElementById('howToGetBtn');
+
+        if (closeTutorialBtn) {
+            closeTutorialBtn.addEventListener('click', () => {
+                videoTutorialPanel.classList.remove('show');
+                // Note: Can't directly pause iframe videos
+            });
+        }
+
+        if (howToGetBtn && videoTutorialPanel) {
+            howToGetBtn.addEventListener('click', () => {
+                videoTutorialPanel.classList.add('show');
+            });
+        }
+
+        // Region Status Checking Function
+        let regionCheckInterval = null;
+        let lastSelectedRegion = null;
+        
+        function startRegionStatusCheck() {
+            // Clear any existing interval
+            if (regionCheckInterval) {
+                clearInterval(regionCheckInterval);
+            }
+            
+            // Function to check region status
+            const checkRegionStatus = async () => {
+                try {
+                    const response = await fetch('/api/region-status');
+                    if (!response.ok) return;
+                    
+                    const statusData = await response.json();
+                    
+                    // Check if there was a fallback used
+                    if (statusData.usedFallback) {
+                        const { original, fallback } = statusData.usedFallback;
+                        const regionStatusAlert = document.getElementById('regionStatusAlert');
+                        
+                        regionStatusAlert.innerHTML = `Your selected region <span class="region-unavailable">${original}</span> was unavailable. Automatically using <span class="region-good">${fallback}</span> instead.`;
+                        regionStatusAlert.classList.add('show');
+                        
+                        // Update the selector UI to match the actual region in use
+                        if (regionSelector) {
+                            const options = Array.from(regionSelector.options);
+                            const fallbackOption = options.find(option => option.value === fallback);
+                            if (fallbackOption) {
+                                regionSelector.value = fallback;
+                            }
+                        }
+                        
+                        // Hide the alert after 8 seconds
+                        setTimeout(() => {
+                            regionStatusAlert.classList.remove('show');
+                        }, 8000);
+                    }
+                    
+                    // Update region availability display
+                    if (statusData.regionAvailability && regionSelector) {
+                        const options = Array.from(regionSelector.options);
+                        options.forEach(option => {
+                            const regionValue = option.value;
+                            const regionStatus = statusData.regionAvailability[regionValue];
+                            
+                            // Clear any existing status indicators
+                            option.textContent = option.textContent.replace(/\s*\(.*\)$/, '');
+                            
+                            // Add status indicator if we have data
+                            if (regionStatus === false) {
+                                option.textContent += ' (Unavailable)';
+                                option.style.color = '#ff3a3a';
+                            } else if (regionStatus === true) {
+                                option.style.color = '';
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Failed to check region status:', error);
+                }
+            };
+            
+            // Do an initial check
+            checkRegionStatus();
+            
+            // Then check every 30 seconds
+            regionCheckInterval = setInterval(checkRegionStatus, 30000);
+        }
+        
+        // Call this when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize cookie section state based on ShowBox checkbox
+            updateCookieSectionState();
+            updateQualityDropdownStates(); 
+            updateScraperApiKeyInputState(); // Initialize ScraperAPI input state on load
+            
+            startRegionStatusCheck();
+            // Initialize indicator if cookie is pre-filled and call regenerate manifest
+            if (cookieInput && cookieInput.value.trim()) {
+                checkCookieOnServer(cookieInput.value.trim());
+            }
+        });
+        
+        // Modify the setCookieBtn event listener to restart region checks when region changes
+        if (setCookieBtn) {
+            const originalListener = setCookieBtn.onclick;
+            setCookieBtn.onclick = function(event) {
+                // Store the newly selected region
+                if (regionSelector) {
+                    lastSelectedRegion = regionSelector.value;
+                }
+                
+                // Restart region status checking
+                startRegionStatusCheck();
+                
+                // Call the original event handler if it exists
+                if (typeof originalListener === 'function') {
+                    return originalListener.call(this, event);
+                }
+            };
+        }
+        
+        // Add a change listener to the region selector
+        if (regionSelector) {
+            regionSelector.addEventListener('change', () => {
+                lastSelectedRegion = regionSelector.value;
+            });
+        }
+
+        // Function to enable/disable quality dropdowns based on provider checkbox state
+        function updateQualityDropdownStates() { // Renamed from updateSortDropdownStates
+            providerCheckboxes.forEach(checkbox => {
+                const providerValue = checkbox.value;
+                const qualityDropdown = document.getElementById(`quality${providerValue.charAt(0).toUpperCase() + providerValue.slice(1)}`); // Changed ID pattern
+                if (qualityDropdown) {
+                    if (providerValue === 'soapertv') { // HollyMovieHD removed from this condition
+                        qualityDropdown.disabled = true; // Always keep SoaperTV disabled
+                    } else {
+                        qualityDropdown.disabled = !checkbox.checked;
+                    }
+                }
+            });
+        }
+
+        // --- MANIFEST URL MIGRATION TOOL SCRIPT ---
+        const vercelManifestInput = document.getElementById('vercelManifestInput');
+        const convertManifestBtn = document.getElementById('convertManifestBtn');
+        const koyebManifestOutputContainer = document.getElementById('koyebManifestOutputContainer');
+        const koyebManifestOutput = document.getElementById('koyebManifestOutput');
+        const copyKoyebManifestBtn = document.getElementById('copyKoyebManifestBtn');
+
+        if (convertManifestBtn) {
+            convertManifestBtn.addEventListener('click', () => {
+                const vercelUrl = vercelManifestInput.value.trim();
+                if (!vercelUrl) {
+                    toast.textContent = 'Please paste your Vercel manifest URL.';
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                    return;
+                }
+
+                if (!vercelUrl.includes('nuvioaddon.vercel.app')) {
+                    toast.textContent = 'This does not look like a Nuvio Vercel URL.';
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                    return;
+                }
+
+                let koyebUrl;
+                const koyebBase = 'https://aesthetic-jodie-tapframe-ab46446c.koyeb.app';
+                
+                if (vercelUrl.includes('manifest.json?')) {
+                    // Handle query parameter format - convert to path-based format for Android compatibility
+                    const queryString = vercelUrl.split('manifest.json?')[1];
+                    const params = new URLSearchParams(queryString);
+                    
+                    // Build path parameters
+                    const pathParams = [];
+                    params.forEach((value, key) => {
+                        pathParams.push(`${key}=${value}`);
+                    });
+                    
+                    if (pathParams.length > 0) {
+                        koyebUrl = `${koyebBase}/${pathParams.join('/')}/manifest.json`;
+                    } else {
+                        koyebUrl = `${koyebBase}/manifest.json`;
+                    }
+                } else if (vercelUrl.includes('/manifest.json')) {
+                    // URL might already be in path format, just replace domain
+                    const pathPart = vercelUrl.split('nuvioaddon.vercel.app')[1];
+                    koyebUrl = `${koyebBase}${pathPart}`;
+                } else {
+                    // Fallback for any other format - just use base URL
+                    koyebUrl = `${koyebBase}/manifest.json`;
+                }
+                
+                koyebManifestOutput.value = koyebUrl;
+                koyebManifestOutputContainer.style.display = 'block';
+
+                toast.textContent = 'Manifest URL converted to Koyeb with Android-compatible format!';
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            });
+        }
+
+        if (copyKoyebManifestBtn) {
+            copyKoyebManifestBtn.addEventListener('click', async () => {
+                if (!koyebManifestOutput.value) return;
+                try {
+                    await navigator.clipboard.writeText(koyebManifestOutput.value);
+                    toast.textContent = 'New Koyeb manifest URL copied!';
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                } catch (err) {
+                    console.error('Failed to copy Koyeb manifest: ', err);
+                    toast.textContent = 'Failed to copy new URL.';
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                }
+            });
+        }
+        // --- END MANIFEST URL MIGRATION TOOL SCRIPT ---
+
+        // NEW: ScraperAPI Tutorial Panel Elements
+        const scraperApiTutorialPanel = document.getElementById('scraperApiTutorialPanel');
+        const closeScraperApiTutorialBtn = document.getElementById('closeScraperApiTutorial');
+        const howToGetScraperApiKeyBtn = document.getElementById('howToGetScraperApiKeyBtn');
+
+        if (closeTutorialBtn) {
+            closeTutorialBtn.addEventListener('click', () => {
+                videoTutorialPanel.classList.remove('show');
+                // Note: Can't directly pause iframe videos
+            });
+        }
+
+        // NEW: Event listeners for ScraperAPI tutorial panel
+        if (closeScraperApiTutorialBtn && scraperApiTutorialPanel) {
+            closeScraperApiTutorialBtn.addEventListener('click', () => {
+                scraperApiTutorialPanel.classList.remove('show');
+            });
+        }
+
+        if (howToGetScraperApiKeyBtn && scraperApiTutorialPanel) {
+            howToGetScraperApiKeyBtn.addEventListener('click', () => {
+                scraperApiTutorialPanel.classList.add('show');
+            });
+        }
+
+    </script>
+    <script src="/_vercel/insights/script.js" defer></script>
+    <!-- Buy Me a Coffee Widget -->
+    
+        
+            
+            
+            
+            
+            
+            
+            
+            
+            
+    
+
+    <!-- Add at the end of the file, before the closing body tag -->
+    <script>
+        // Handles display of banners and ElfHosted info based on hostname
+        (function() {
+            const currentHostname = window.location.hostname;
+            const officialHostnames = ['nuviostreams.hayd.uk', 'localhost', '127.0.0.1'];
+
+            const elfhostedInfoSection = document.getElementById('elfhostedInfoSection');
+            
+            const officialInstanceBanner = document.getElementById('officialInstanceBanner');
+            const unofficialInstanceBanner = document.getElementById('unofficialInstanceBanner');
+            
+            const closeOfficialBanner = document.getElementById('closeOfficialBanner');
+            const closeUnofficialBanner = document.getElementById('closeUnofficialBanner');
+
+            if (officialHostnames.includes(currentHostname)) {
+                // This is an official instance
+                if (elfhostedInfoSection) {
+                    elfhostedInfoSection.style.display = 'block';
+                }
+                if (officialInstanceBanner && !localStorage.getItem('officialBannerDismissed')) {
+                    officialInstanceBanner.style.display = 'block';
+                    document.body.classList.add('has-instance-banner');
+                }
+            } else {
+                // This is a Vercel, Koyeb, or other community instance
+                if (elfhostedInfoSection) {
+                    elfhostedInfoSection.style.display = 'none';
+                }
+                if (unofficialInstanceBanner && !localStorage.getItem('unofficialBannerDismissed')) {
+                    unofficialInstanceBanner.style.display = 'block';
+                    document.body.classList.add('has-instance-banner');
+                }
+            }
+            
+            // Handlers for closing banners
+            if (closeOfficialBanner) {
+                closeOfficialBanner.addEventListener('click', () => {
+                    if (officialInstanceBanner) officialInstanceBanner.style.display = 'none';
+                    document.body.classList.remove('has-instance-banner');
+                    localStorage.setItem('officialBannerDismissed', 'true');
+                     setTimeout(() => {
+                        localStorage.removeItem('officialBannerDismissed');
+                    }, 24 * 60 * 60 * 1000); // Expires in 24 hours
+                });
+            }
+            
+            if (closeUnofficialBanner) {
+                closeUnofficialBanner.addEventListener('click', () => {
+                    if (unofficialInstanceBanner) unofficialInstanceBanner.style.display = 'none';
+                    document.body.classList.remove('has-instance-banner');
+                     localStorage.setItem('unofficialBannerDismissed', 'true');
+                     setTimeout(() => {
+                        localStorage.removeItem('unofficialBannerDismissed');
+                    }, 24 * 60 * 60 * 1000); // Expires in 24 hours
+                });
+            }
+
+            // Also ensure the old vercel-to-koyeb banner is hidden
+            const vercelToKoyebBanner = document.getElementById('instanceBanner');
+            if (vercelToKoyebBanner) {
+                vercelToKoyebBanner.style.display = 'none';
+            }
+
+        })();
+    </script>
+    
+    <!-- Ko-fi floating button -->
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+      kofiWidgetOverlay.draw('tapframe', {
+        'type': 'floating-chat',
+        'floating-chat.donateButton.text': 'Support me',
+        'floating-chat.donateButton.background-color': '#00b9fe',
+        'floating-chat.donateButton.text-color': '#fff'
+      });
+    </script>
+
+    <!-- Apply ElfHosted Theme -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply ElfHosted theme to body
+            document.body.classList.add('elfhosted-theme');
+            
+            // Hide all instance banners for ElfHosted private instances
+            const banners = document.querySelectorAll('.instance-banner');
+            banners.forEach(banner => {
+                banner.style.display = 'none';
+            });
+            
+            // Show ElfHosted info section
+            const elfhostedInfoSection = document.getElementById('elfhostedInfoSection');
+            if (elfhostedInfoSection) {
+                elfhostedInfoSection.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 

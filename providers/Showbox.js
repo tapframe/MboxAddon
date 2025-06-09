@@ -883,11 +883,27 @@ const _searchAndExtractShowboxUrl = async (searchTerm, originalTmdbTitle, mediaY
                     itemYear = yearMatch[1];
                 }
                 
-                // Extract year from URL if possible
+                // Extract year from URL if possible - IMPROVED regex to catch years anywhere in URL
                 if (!itemYear && itemHref) {
-                    const urlYearMatch = itemHref.match(/-(20\d{2})$/);
-                    if (urlYearMatch) {
-                        itemYear = urlYearMatch[1];
+                    // Try multiple patterns to extract year from URLs
+                    const urlYearPatterns = [
+                        /-(\d{4})$/, // Year at the end: "-1998"
+                        /-(\d{4})-/, // Year in middle: "-1998-"
+                        /\/(\d{4})$/, // Year at end with slash: "/1998"
+                        /\/(\d{4})\//, // Year with slashes: "/1998/"
+                        /-(\d{4})(?=\W|$)/ // Year followed by non-word or end
+                    ];
+                    
+                    for (const pattern of urlYearPatterns) {
+                        const urlYearMatch = itemHref.match(pattern);
+                        if (urlYearMatch && urlYearMatch[1]) {
+                            const extractedYear = parseInt(urlYearMatch[1]);
+                            // Only accept reasonable years (1900-2030)
+                            if (extractedYear >= 1900 && extractedYear <= 2030) {
+                                itemYear = urlYearMatch[1];
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -947,19 +963,23 @@ const _searchAndExtractShowboxUrl = async (searchTerm, originalTmdbTitle, mediaY
                     score += wordMatchPercent * 5; // Up to 5 points for word matches
                 }
                 
-                // YEAR MATCHING - now much more important
+                // YEAR MATCHING - now much more important with STRICTER penalties
                 if (mediaYear && itemYear) {
                     if (mediaYear === itemYear) {
                         score += 18; // MUCH stronger bonus for exact year match
                     } else {
-                        // Penalty for year mismatch, larger for bigger differences
+                        // MUCH STRONGER penalties for year mismatch
                         const yearDiff = Math.abs(parseInt(mediaYear) - parseInt(itemYear));
                         if (yearDiff <= 1) {
                             score -= 3; // Small penalty for 1 year difference
                         } else if (yearDiff <= 3) {
                             score -= 10; // Medium penalty for 2-3 year difference
+                        } else if (yearDiff <= 5) {
+                            score -= 25; // Large penalty for 4-5 year difference
+                        } else if (yearDiff <= 10) {
+                            score -= 40; // Very large penalty for 6-10 year difference
                         } else {
-                            score -= 20; // Large penalty for > 3 year difference
+                            score -= 100; // MASSIVE penalty for >10 year difference (should be dealbreaker)
                         }
                     }
                 } else if (mediaYear && !itemYear) {
@@ -1020,8 +1040,8 @@ const _searchAndExtractShowboxUrl = async (searchTerm, originalTmdbTitle, mediaY
             strategyResults[strategy.description] = { success: false, score: 0 };
         }
         
-        // LOWERED THRESHOLD: If we found a good enough match (score > 20 instead of 25), stop searching
-        if (bestResult.score > 20 && bestResult.isCorrectType) {
+        // RAISED THRESHOLD: Require higher score for early termination to prevent false matches
+        if (bestResult.score > 30 && bestResult.isCorrectType) {
             console.log(`  Found good match with score ${bestResult.score.toFixed(1)} using strategy "${bestResult.strategy}", stopping search`);
             break;
         }
@@ -1039,23 +1059,73 @@ const _searchAndExtractShowboxUrl = async (searchTerm, originalTmdbTitle, mediaY
         }
     });
 
-    // Final decision based on all strategies
+    // Final decision based on all strategies with STRICTER validation
     if (bestResult.url) {
-        // Analyze match confidence based on score, correct type, and year match
+        // Calculate year difference for validation
+        let yearMismatch = false;
+        let yearDifference = 0;
+        if (mediaYear && bestResult.year) {
+            yearDifference = Math.abs(parseInt(mediaYear) - parseInt(bestResult.year));
+            yearMismatch = yearDifference > 0;
+        }
+
+        // STRICT dealbreaker criteria - reject immediately for massive mismatches
+        const isDealbreaker = (
+            yearDifference > 15 || // >15 year difference is almost certainly wrong
+            bestResult.score < 0 || // Negative scores are definitely wrong
+            !bestResult.isCorrectType // Wrong media type (movie vs TV)
+        );
+
+        if (isDealbreaker) {
+            console.log(`  ❌ DEALBREAKER: Rejecting match due to: ${
+                yearDifference > 15 ? `Massive year difference (${yearDifference} years)` :
+                bestResult.score < 0 ? `Negative score (${bestResult.score.toFixed(1)})` :
+                !bestResult.isCorrectType ? 'Wrong media type' : 'Unknown reason'
+            }`);
+            console.log(`  No suitable match found on ShowBox search for: ${originalTmdbTitle} (${mediaYear || 'N/A'})`);
+            if (process.env.DISABLE_CACHE !== 'true') {
+                await saveToCache(searchTermKey, 'NO_MATCH_FOUND', cacheSubDir);
+            }
+            return { url: null, score: -1 };
+        }
+
+        // Analyze match confidence with STRICTER thresholds
         let matchConfidence = "LOW";
-        if (bestResult.score >= 25 && bestResult.isCorrectType) {
+        if (bestResult.score >= 35 && bestResult.isCorrectType && yearDifference <= 1) {
             matchConfidence = "HIGH";
-        } else if (bestResult.score >= 15 && bestResult.isCorrectType) {
+        } else if (bestResult.score >= 25 && bestResult.isCorrectType && yearDifference <= 3) {
             matchConfidence = "MEDIUM";
+        }
+        
+        // STRICT: Only accept HIGH confidence for matches with year mismatches > 5 years
+        if (yearDifference > 5 && matchConfidence !== "HIGH") {
+            console.log(`  ❌ REJECTING: ${yearDifference}-year mismatch requires HIGH confidence, but got ${matchConfidence} (score: ${bestResult.score.toFixed(1)})`);
+            console.log(`  No suitable match found on ShowBox search for: ${originalTmdbTitle} (${mediaYear || 'N/A'})`);
+            if (process.env.DISABLE_CACHE !== 'true') {
+                await saveToCache(searchTermKey, 'NO_MATCH_FOUND', cacheSubDir);
+            }
+            return { url: null, score: -1 };
+        }
+
+        // STRICT: Only accept MEDIUM+ confidence for any year mismatch > 1 year
+        if (yearDifference > 1 && matchConfidence === "LOW") {
+            console.log(`  ❌ REJECTING: ${yearDifference}-year mismatch requires at least MEDIUM confidence, but got LOW (score: ${bestResult.score.toFixed(1)})`);
+            console.log(`  No suitable match found on ShowBox search for: ${originalTmdbTitle} (${mediaYear || 'N/A'})`);
+            if (process.env.DISABLE_CACHE !== 'true') {
+                await saveToCache(searchTermKey, 'NO_MATCH_FOUND', cacheSubDir);
+            }
+            return { url: null, score: -1 };
         }
         
         const confidenceWarning = matchConfidence !== "HIGH" ? 
             `[⚠️ ${matchConfidence} CONFIDENCE MATCH - may not be correct]` : "";
         
-        console.log(`  Best overall match: ${bestResult.url} (Score: ${bestResult.score.toFixed(1)}, Strategy: ${bestResult.strategy}) ${confidenceWarning}`);
+        const yearWarning = yearMismatch ? `[⚠️ YEAR MISMATCH: ${yearDifference} years]` : "";
         
-        // Only save to cache if we have high confidence or if there's no better option
-        if (matchConfidence === "HIGH" || (bestResult.score > 5 && bestResult.isCorrectType)) {
+        console.log(`  Best overall match: ${bestResult.url} (Score: ${bestResult.score.toFixed(1)}, Strategy: ${bestResult.strategy}) ${confidenceWarning} ${yearWarning}`);
+        
+        // Only save to cache if we have high confidence or perfect match
+        if (matchConfidence === "HIGH" || (bestResult.score > 20 && bestResult.isCorrectType && yearDifference <= 1)) {
             if (process.env.DISABLE_CACHE !== 'true') {
                 await saveToCache(searchTermKey, bestResult.url, cacheSubDir);
             }

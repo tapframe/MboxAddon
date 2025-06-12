@@ -43,6 +43,7 @@ app.use(async (req, res, next) => {
     const userRegionPreference = req.query.region;
     const userProvidersQuery = req.query.providers;
     const userMinQualitiesQuery = req.query.min_qualities;
+    const userEinthusanLangsQuery = req.query.einthusan_langs;
     const userScraperApiKey = req.query.scraper_api_key;
 
     // Extract from URL path (new format for Android compatibility)
@@ -82,6 +83,7 @@ app.use(async (req, res, next) => {
     const region = pathParams.region || userRegionPreference;
     const providers = pathParams.providers || userProvidersQuery;
     const minQualities = pathParams.min_qualities || userMinQualitiesQuery;
+    const einthusanLangs = pathParams.einthusan_langs || userEinthusanLangsQuery;
     const scraperApiKey = pathParams.scraper_api_key || userScraperApiKey;
 
     if (cookie) {
@@ -103,6 +105,14 @@ app.use(async (req, res, next) => {
             global.currentRequestConfig.minQualities = JSON.parse(decodedQualities);
         } catch (e) {
             console.error(`[server.js] Error parsing min_qualities from request: ${minQualities}`, e.message);
+        }
+    }
+    if (einthusanLangs) {
+        try {
+            const decodedLangs = decodeURIComponent(einthusanLangs);
+            global.currentRequestConfig.einthusan_langs = decodedLangs.split(',').map(l => l.toLowerCase());
+        } catch (e) {
+            console.error(`[server.js] Error decoding einthusan_langs from request: ${einthusanLangs}`, e.message);
         }
     }
     if (scraperApiKey) {
@@ -346,6 +356,7 @@ app.get('*manifest.json', async (req, res) => {
         const userCookie = global.currentRequestConfig.cookie;
         const userRegion = global.currentRequestConfig.region;
         const userProviders = global.currentRequestConfig.providers;
+        const userEinthusanLangs = global.currentRequestConfig.einthusan_langs;
 
         const originalManifest = addonInterface.manifest;
         let personalizedManifest = JSON.parse(JSON.stringify(originalManifest)); // Deep clone
@@ -439,6 +450,21 @@ app.get('*manifest.json', async (req, res) => {
             console.log(`[Manifest] Minimum qualities (${minQualitiesString}) will be part of the config.`);
         }
 
+        // Handle Einthusan languages
+        if (global.currentRequestConfig.einthusan_langs) {
+            isPersonalized = true;
+            const langsString = global.currentRequestConfig.einthusan_langs.join(',');
+            personalizedManifest.config.push({
+                key: 'einthusanLangs',
+                type: 'text',
+                title: 'Einthusan Languages (auto-set)',
+                default: langsString,
+                required: false,
+                hidden: true
+            });
+            console.log(`[Manifest] Einthusan languages (${langsString}) will be part of the config.`);
+        }
+
         // Handle Scraper API key
         if (global.currentRequestConfig.scraper_api_key) {
             isPersonalized = true;
@@ -456,7 +482,7 @@ app.get('*manifest.json', async (req, res) => {
 
         if (isPersonalized) {
             // Create a simple identifier from the combination for the manifest ID
-            let identifierSource = (userCookie || 'nocookie') + '-' + (userRegion || 'noregion') + '-' + (userProviders || 'allproviders');
+            let identifierSource = (userCookie || 'nocookie') + '-' + (userRegion || 'noregion') + '-' + (userProviders || 'allproviders') + '-' + (userEinthusanLangs ? userEinthusanLangs.join(',') : 'alllangs');
             const hash = crypto.createHash('sha1').update(identifierSource).digest('hex').substring(0, 8);
             personalizedManifest.id = `${originalManifest.id}_${hash}`;
             console.log(`[Manifest] Personalized manifest ID set to: ${personalizedManifest.id}`);

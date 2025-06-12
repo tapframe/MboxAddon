@@ -79,6 +79,7 @@ const { getCuevanaStreams } = require('./providers/cuevana.js'); // Import from 
 const { getHianimeStreams } = require('./providers/hianime.js'); // Import from hianime.js
 const { getStreamContent } = require('./providers/vidsrcextractor.js'); // Import from vidsrcextractor.js
 const { getVidZeeStreams } = require('./providers/VidZee.js'); // NEW: Import from VidZee.js
+const { getAllEinthusanStreams } = require('./providers/einthusan.js');
 
 // --- Constants ---
 const TMDB_API_URL = 'https://api.themoviedb.org/3';
@@ -460,6 +461,10 @@ builder.defineStreamHandler(async (args) => {
         console.log(`[addon.js] Minimum quality preferences: ${JSON.stringify(minQualitiesPreferences)}`);
     } else {
         console.log(`[addon.js] No minimum quality preferences set by user.`);
+    }
+    const einthusanLanguages = requestSpecificConfig.einthusan_langs || null;
+    if (einthusanLanguages) {
+        console.log(`[addon.js] Einthusan languages set by user: ${einthusanLanguages.join(',')}`);
     }
 
     console.log("--- FULL ARGS OBJECT (from SDK) ---");
@@ -1025,6 +1030,29 @@ builder.defineStreamHandler(async (args) => {
                 await saveStreamToCache('vidzee', tmdbTypeFromId, tmdbId, [], 'failed', seasonNum, episodeNum, null, userScraperApiKey);
                 return [];
             }
+        },
+
+        einthusan: async() => {
+            if (!shouldFetch('einthusan')) {
+                console.log('[Einthusan] Skipping fetch: Not selected by user.');
+                return [];
+            }
+
+            try {
+                console.log(`[Einthusan] Fetching new streams...`);
+                const streams = await getAllEinthusanStreams(initialTitleFromConversion, id, einthusanLanguages);
+
+                if (streams && streams.length > 0) {
+                    console.log(`[Einthusan] Successfully fetched ${streams.length} streams.`);
+                    return streams.map(stream => ({ ...stream, provider: 'Einthusan' }));
+                } else {
+                    console.log(`[Einthusan] No streams returned.`);
+                    return [];
+                }
+            } catch (err) {
+                console.error(`[Einthusan] Error fetching streams:`, err.message);
+                return [];
+            }
         }
     };
 
@@ -1041,7 +1069,8 @@ builder.defineStreamHandler(async (args) => {
             providerFetchFunctions.cuevana(),
             providerFetchFunctions.hianime(),
             providerFetchFunctions.vidsrc(),
-            providerFetchFunctions.vidzee()
+            providerFetchFunctions.vidzee(),
+            providerFetchFunctions.einthusan() // NEW: Add Einthusan provider
         ]);
         
         // Process results into streamsByProvider object
@@ -1053,7 +1082,8 @@ builder.defineStreamHandler(async (args) => {
             'Cuevana': ENABLE_CUEVANA_PROVIDER && shouldFetch('cuevana') ? filterStreamsByQuality(providerResults[4], minQualitiesPreferences.cuevana, 'Cuevana') : [],
             'Hianime': shouldFetch('hianime') ? filterStreamsByQuality(providerResults[5], minQualitiesPreferences.hianime, 'Hianime') : [],
             'VidSrc': shouldFetch('vidsrc') ? filterStreamsByQuality(providerResults[6], minQualitiesPreferences.vidsrc, 'VidSrc') : [],
-            'VidZee': ENABLE_VIDZEE_PROVIDER && shouldFetch('vidzee') ? filterStreamsByQuality(providerResults[7], minQualitiesPreferences.vidzee, 'VidZee') : []
+            'VidZee': ENABLE_VIDZEE_PROVIDER && shouldFetch('vidzee') ? filterStreamsByQuality(providerResults[7], minQualitiesPreferences.vidzee, 'VidZee') : [],
+            'Einthusan': shouldFetch('einthusan') ? filterStreamsByQuality(providerResults[8], minQualitiesPreferences.einthusan, 'Einthusan') : []
         };
 
         // Sort streams by quality for each provider
@@ -1063,7 +1093,8 @@ builder.defineStreamHandler(async (args) => {
 
         // Combine streams in the preferred provider order
         combinedRawStreams = [];
-        const providerOrder = ['ShowBox', 'Hianime', 'Xprime.tv', 'HollyMovieHD', 'Soaper TV', 'VidZee', 'Cuevana', 'VidSrc'];
+        // Put Einthusan first because it is a dedicated provider for Bollywood, which is niche and should be the first to appear for bollywood movies, however this won't affect the order for other movies.
+        const providerOrder = ['Einthusan','ShowBox', 'Hianime', 'Xprime.tv', 'HollyMovieHD', 'Soaper TV', 'VidZee', 'Cuevana', 'VidSrc'];
         providerOrder.forEach(providerKey => {
             if (streamsByProvider[providerKey] && streamsByProvider[providerKey].length > 0) {
                 combinedRawStreams.push(...streamsByProvider[providerKey]);
@@ -1134,6 +1165,8 @@ builder.defineStreamHandler(async (args) => {
             // For Hianime, language is 'dub' or 'sub' from the stream object
             const category = stream.language ? (stream.language === 'sub' ? 'OG' : stream.language.toUpperCase()) : 'UNK';
             providerDisplayName = `Hianime ${category} 🍥`;
+        } else if (stream.provider === "Einthusan") {
+            providerDisplayName = `Einthusan (${stream.language ? stream.language.toUpperCase() : 'UNK'}) 🎬`; // Einthusan specific display
         }
 
         let nameDisplay;
@@ -1242,15 +1275,25 @@ ${titleSecondLine}` : displayTitle;
 ${warningMessage}`;
         }
 
+        
+        const behaviorHints = {
+            notWebReady: true // As per the working example, indicates Stremio might need to handle it carefully or use external player,
+        };
+
+        // allows the provider to define their own headers if they need
+        const streamHeaders = stream.headers;
+        if (streamHeaders) {
+            behaviorHints .proxyHeaders = streamHeaders;
+            console.log(`[addon.js] Adding proxy headers \n${ JSON.stringify(streamHeaders, null, 2) }`)
+        }
+
         return {
             name: nameDisplay, 
             title: finalTitle, 
             url: stream.url,
             type: 'url', // CRITICAL: This is the type of the stream itself, not the content
             availability: 2, 
-            behaviorHints: {
-                notWebReady: true // As per the working example, indicates Stremio might need to handle it carefully or use external player
-            }
+            behaviorHints,
         };
     });
 

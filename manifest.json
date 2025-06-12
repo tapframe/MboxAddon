@@ -1,6 +1,6 @@
 {
   "id": "org.nuvio.streams",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "name": "Nuvio Streams | Elfhosted",
   "description": "Stremio addon for high-quality streaming links.",
   "logo": "https://raw.githubusercontent.com/tapframe/NuvioStreaming/main/assets/titlelogo.png",

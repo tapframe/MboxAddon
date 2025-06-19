@@ -1,0 +1,10 @@
+services:
+  nuvio-addon:
+    build: .
+    image: nuvio-streams-addon:latest
+    container_name: nuvio-streams-addon
+    ports:
+      - "7000:7000"
+    env_file:
+      - .env
+    restart: unless-stopped
